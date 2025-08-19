@@ -7,6 +7,18 @@ document.querySelector('.btn.btn-warning').addEventListener('click', fQTransform
 document.querySelector('.btn.btn-light').addEventListener('click', fQTransformOnly);
 document.querySelector('.btn.btn-info').addEventListener('click', bookTransform);
 
+document.querySelector('.btn.btn-danger.clear-all').addEventListener('click', ClearAlls);
+document.querySelector('.btn.btn-danger.clear-res').addEventListener('click', ClearRespose);
+
+async function ClearRespose() {
+document.querySelector('.form-control.output').value="";
+
+}
+async function ClearAlls() {
+	document.querySelector('.form-control.input').value="";
+	document.querySelector('.form-control.output').value="";
+}
+
 async function bracketRemove(){
     let input = document.querySelector('.form-control.input').value;
     let output = document.querySelector('.form-control.output');
