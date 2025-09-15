@@ -9,6 +9,11 @@ document.querySelector('.btn.btn-info').addEventListener('click', bookTransform)
 
 document.querySelector('.btn.btn-danger.clear-all').addEventListener('click', ClearAlls);
 document.querySelector('.btn.btn-danger.clear-res').addEventListener('click', ClearRespose);
+const currentYear = new Date().getFullYear();
+const childAge = currentYear - 8;
+const infantAge = currentYear - 1;
+const seniorAge = currentYear - 62;
+const AdultAge = currentYear - 30;
 
 async function ClearRespose() {
 document.querySelector('.form-control.output').value="";
@@ -352,16 +357,16 @@ const XSLTconstant = {
 					"          </xsl:variable>\n" +
 					"          <xsl:choose>\n" +
 					"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-					"              <DateOfBirth>2024-07-01T00:00:00</DateOfBirth>\n" +
+					"              <DateOfBirth>" + infantAge +"-07-01T00:00:00</DateOfBirth>\n" +
 					"            </xsl:when>\n" +
 					"            <xsl:when test=\"$passengerType=string('Child')\">\n" +
-					"              <DateOfBirth>2014-01-01T00:00:00</DateOfBirth>\n" +
+					"              <DateOfBirth>" + childAge +"-01-01T00:00:00</DateOfBirth>\n" +
 					"            </xsl:when>\n" +
 					"            <xsl:when test=\"$passengerType=string('Senior')\">\n" +
-					"              <DateOfBirth>1962-01-01T00:00:00</DateOfBirth>\n" +
+					"              <DateOfBirth>" + seniorAge +"-01-01T00:00:00</DateOfBirth>\n" +
 					"            </xsl:when>\n" +
 					"            <xsl:otherwise>\n" +
-					"              <DateOfBirth>1990-01-01T00:00:00</DateOfBirth>\n" +
+					"              <DateOfBirth>" + AdultAge +"-01-01T00:00:00</DateOfBirth>\n" +
 					"            </xsl:otherwise>\n" +
 					"          </xsl:choose>\n" +
 					"          <Email>uapi_air_test@tbo.com</Email>\n" +
@@ -855,6 +860,9 @@ const XSLTconstant = {
     		+ "            <BookingClass>\r\n"
     		+ "              <xsl:value-of select=\"BookingClass\"/>\r\n"
     		+ "            </BookingClass>\r\n"
+		    //+ "            <CabinBaggage>\r\n"
+		    //+ "              <xsl:value-of select=\"CabinBaggage\"/>\r\n"
+		    //+ "            </CabinBaggage>\r\n"
     		+ "            <xsl:choose>\r\n"
     		+ "              <xsl:when test=\"CabinBaggage &gt; 0 or CabinBaggage!=string('')\">\r\n"
     		+ "                <CabinBaggage>\r\n"
