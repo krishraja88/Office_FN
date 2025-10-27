@@ -379,7 +379,7 @@ const XSLTconstant = {
 		"          <FFNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </FFNumber>\n" +
-		"   alert($loopIndex)       <xsl:if test=\"$loopIndex=string('1')\">\n" +
+		"			<xsl:if test=\"$loopIndex=string('1')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Raju</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Kumar</xsl:variable>\n" +
 		"            <FirstName>\n" +
