@@ -166,6 +166,10 @@ const XSLTconstant = {
 		"  </xsl:variable>\n" +
 		"\n" +
 		"  <xsl:variable name=\"currency\" select=\"//SearchResult/Currency\" />\n" +
+		"\n" 
+		+"<xsl:variable name=\"responseParams\">\n"
+        +"<xsl:copy-of select=\"//SearchResult/ResponseParams/*\"/>\n"
+        +"</xsl:variable>\n"+
 		"\n" +
 		"  <xsl:variable name=\"segments\">\n" +
 		"    <xsl:copy-of select=\"//SearchResult/Flights/ArrayOfFlightInfo/FlightInfo\"/>\n" +
@@ -315,6 +319,9 @@ const XSLTconstant = {
 		"    <PromoCode>\n" +
 		"      <xsl:value-of select=\"''\"/>\n" +
 		"    </PromoCode>\n" +
+		"    <ResponseParams>\n" +
+		"      <xsl:copy-of select=\"$responseParams\"/>\n" +
+		"    </ResponseParams>\n" +
 		"    <Segments>\n" +
 		"      <xsl:copy-of select=\"$segments\"/>\n" +
 		"    </Segments>\n" +
@@ -693,9 +700,39 @@ const XSLTconstant = {
 		"            <AirlineMealCharges>0</AirlineMealCharges>\n" +
 		"            <AirlineSSRCharges>0</AirlineSSRCharges>\n" +
 		"            <AirlineSeatCharges>0</AirlineSeatCharges>\n" +
+		"           <xsl:choose>\n" +
+		"           <xsl:when test=\"number(Commission) > 0\">\n" +
+		"        <Commission>\n" +
+		"            <xsl:value-of select=\"(./Commission)div(./PassengerCount)\"/>\n" +
+		"        </Commission>\n" +
+		"       </xsl:when>\n" +
+		"       <xsl:otherwise>\n" +
+		"        <Commission>0</Commission>\n" +
+		"       </xsl:otherwise>\n" +
+		"       </xsl:choose>\n" +
 		"            <Currency>\n" +
 		"              <xsl:value-of select=\"$currency\"/>\n" +
 		"            </Currency>\n" +
+		"       <xsl:choose>\n" +
+		"     <xsl:when test=\"number(Discount) > 0\">\n" +
+		"        <Discount>\n" +
+		"            <xsl:value-of select=\"(./Discount)div(./PassengerCount)\"/>\n" +
+		"        </Discount>\n" +
+		"    </xsl:when>\n" +
+		"    <xsl:otherwise>\n" +
+		"        <Discount>0</Discount>\n" +
+		"    </xsl:otherwise>\n" +
+		"       </xsl:choose>\n" +
+		"     <xsl:choose>\n" +
+		"    <xsl:when test=\"number(Incentive) > 0\">\n" +
+		"        <Incentive>\n" +
+		"            <xsl:value-of select=\"(./Incentive)div(./PassengerCount)\"/>\n" +
+		"        </Incentive>\n" +
+		"    </xsl:when>\n" +
+		"    <xsl:otherwise>\n" +
+		"        <Incentive>0</Incentive>\n" +
+		"    </xsl:otherwise>\n" +
+		"     </xsl:choose>\n" +
 		"            <Markup>0</Markup>\n" +
 		"            <NetFare>0</NetFare>\n" +
 		"            <OtherCharges>0</OtherCharges>\n" +
@@ -798,6 +835,9 @@ const XSLTconstant = {
 		+ "          <FareBasisCode>\r\n"
 		+ "            <xsl:value-of select=\"FareBasisCode\"/>\r\n"
 		+ "          </FareBasisCode>\r\n"
+		+ "			<FareRestriction>\r\n"
+		+ "				<xsl:value-of select=\"FareRestriction\"/>\r\n"
+		+ "			</FareRestriction>\r\n"
 		+ "			<FareRuleIndex>\r\n"
 		+ "				<xsl:value-of select=\"FareRuleIndex\"/>\r\n"
 		+ "			</FareRuleIndex>\r\n"
@@ -811,6 +851,12 @@ const XSLTconstant = {
 		+ "              <FlightId>0</FlightId>\r\n"
 		+ "            </xsl:otherwise>\r\n"
 		+ "          </xsl:choose>\r\n"
+		+ "			<Id>\r\n"
+		+ "				<xsl:value-of select=\"Id\"/>\r\n"
+		+ "			</Id>\r\n"
+		+ "			<JourneyId>\r\n"
+		+ "				<xsl:value-of select=\"JourneyId\"/>\r\n"
+		+ "			</JourneyId>\r\n"
 		+ "          <Origin>\r\n"
 		+ "            <xsl:value-of select=\"Origin\"/>\r\n"
 		+ "          </Origin>\r\n"
@@ -835,6 +881,46 @@ const XSLTconstant = {
 		+ "          <BaseFare>\r\n"
 		+ "            <xsl:value-of select=\"BaseFare\"/>\r\n"
 		+ "          </BaseFare>\r\n"
+		+ "<xsl:choose>\r\n"
+		+ "    <xsl:when test=\"number(Commission) > 0\">\r\n"
+		+ "        <Commission>\r\n"
+		+ "            <xsl:value-of select=\"Commission\"/>\r\n"
+		+ "        </Commission>\r\n"
+		+ "    </xsl:when>\r\n"
+		+ "    <xsl:otherwise>\r\n"
+		+ "        <Commission>0</Commission>\r\n"
+		+ "    </xsl:otherwise>\r\n"
+		+ "</xsl:choose>\r\n"
+		+ "<xsl:choose>\r\n"
+		+ "    <xsl:when test=\"number(Discount) > 0\">\r\n"
+		+ "        <Discount>\r\n"
+		+ "            <xsl:value-of select=\"Discount\"/>\r\n"
+		+ "        </Discount>\r\n"
+		+ "    </xsl:when>\r\n"
+		+ "    <xsl:otherwise>\r\n"
+		+ "        <Discount>0</Discount>\r\n"
+		+ "    </xsl:otherwise>\r\n"
+		+ "</xsl:choose>\r\n"
+		+ "<xsl:choose>\r\n"
+		+ "    <xsl:when test=\"number(Incentive) > 0\">\r\n"
+		+ "        <Incentive>\r\n"
+		+ "            <xsl:value-of select=\"Incentive\"/>\r\n"
+		+ "        </Incentive>\r\n"
+		+ "    </xsl:when>\r\n"
+		+ "    <xsl:otherwise>\r\n"
+		+ "        <Incentive>0</Incentive>\r\n"
+		+ "    </xsl:otherwise>\r\n"
+		+ "</xsl:choose>\r\n"
+		+ "<xsl:choose>\r\n"
+		+ "    <xsl:when test=\"number(PLBAmount) > 0\">\r\n"
+		+ "        <PLBAmount>\r\n"
+		+ "            <xsl:value-of select=\"PLBAmount\"/>\r\n"
+		+ "        </PLBAmount>\r\n"
+		+ "    </xsl:when>\r\n"
+		+ "    <xsl:otherwise>\r\n"
+		+ "        <PLBAmount>0</PLBAmount>\r\n"
+		+ "    </xsl:otherwise>\r\n"
+		+ "   </xsl:choose>\r\n"
 		+ "          <PassengerCount>\r\n"
 		+ "            <xsl:value-of select=\"PassengerCount\"/>\r\n"
 		+ "          </PassengerCount>\r\n"
@@ -1008,7 +1094,17 @@ const XSLTconstant = {
 		+ "              </xsl:when>\r\n"
 		+ "            </xsl:choose>\r\n"
 		+ "            <ETicketEligible>true</ETicketEligible>\r\n"
-		+ "            <FlightInfoIndex><xsl:value-of select=\"flightinfoindex\"/></FlightInfoIndex>\r\n"
+		+ "          <xsl:choose>\r\n"
+		+ "            <xsl:when test=\"FlightId &gt; 0\">\r\n"
+		+ "              <FlightId>\r\n"
+		+ "                <xsl:value-of select=\"FlightId\"/>\r\n"
+		+ "              </FlightId>\r\n"
+		+ "            </xsl:when>\r\n"
+		+ "            <xsl:otherwise>\r\n"
+		+ "              <FlightId>0</FlightId>\r\n"
+		+ "            </xsl:otherwise>\r\n"
+		+ "          </xsl:choose>\r\n"
+		+ "            <FlightInfoIndex><xsl:value-of select=\"FlightInfoIndex\"/></FlightInfoIndex>\r\n"
 		+ "            <FlightNumber>\r\n"
 		+ "              <xsl:value-of select=\"FlightNumber\"/>\r\n"
 		+ "            </FlightNumber>\r\n"
