@@ -386,7 +386,7 @@ const XSLTconstant = {
 		"          <FFNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </FFNumber>\n" +
-		"			<xsl:if test=\"$loopIndex=string('1')\">\n" +
+		"			      <xsl:if test=\"$loopIndex=string('1')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Raju</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Kumar</xsl:variable>\n" +
 		"            <FirstName>\n" +
@@ -409,7 +409,7 @@ const XSLTconstant = {
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
-		"              <IdNumber>12345</IdNumber>\n" +
+		"              <IdNumber>12341</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
@@ -441,7 +441,7 @@ const XSLTconstant = {
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
-		"              <IdNumber>12346</IdNumber>\n" +
+		"              <IdNumber>12342</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
@@ -473,7 +473,7 @@ const XSLTconstant = {
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
-		"              <IdNumber>12347</IdNumber>\n" +
+		"              <IdNumber>12343</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
@@ -502,6 +502,13 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>12344</IdNumber>\n" +
+		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </IdDetails>\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -529,10 +536,12 @@ const XSLTconstant = {
 		"            <Gender>Male</Gender>\n" +
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
-		"              <IdNumber>12348</IdNumber>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>12345</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
+
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -560,10 +569,13 @@ const XSLTconstant = {
 		"            <Gender>Male</Gender>\n" +
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
-		"              <IdNumber>12349</IdNumber>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>12346</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
+
+
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -591,10 +603,12 @@ const XSLTconstant = {
 		"            <Gender>Male</Gender>\n" +
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
-		"              <IdNumber>12350</IdNumber>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>12347</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
+
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -622,10 +636,13 @@ const XSLTconstant = {
 		"            <Gender>Female</Gender>\n" +
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
-		"              <IdNumber>12351</IdNumber>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>12348</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
+
+
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -653,10 +670,13 @@ const XSLTconstant = {
 		"            <Gender>Male</Gender>\n" +
 		"            <IdDetails>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
-		"              <IdNumber>12352</IdNumber>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>12349</IdNumber>\n" +
 		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
 		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </IdDetails>\n" +
+
+
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
