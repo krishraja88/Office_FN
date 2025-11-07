@@ -153,7 +153,6 @@ function transformSearch(searchResultSet, stepName) {
     return new XMLSerializer().serializeToString(transformedDoc);
 }
 
-
 const XSLTconstant = {
 	BookXslt: "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" +
 		"                 xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
@@ -367,7 +366,7 @@ const XSLTconstant = {
 		"          </xsl:variable>\n" +
 		"          <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <DateOfBirth>" + infantAge + "-07-01T00:00:00</DateOfBirth>\n" +
+		"              <DateOfBirth>" + infantAge + "-01-01T00:00:00</DateOfBirth>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:when test=\"$passengerType=string('Child')\">\n" +
 		"              <DateOfBirth>" + childAge + "-01-01T00:00:00</DateOfBirth>\n" +
@@ -410,8 +409,16 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12341</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
@@ -442,8 +449,16 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12342</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
@@ -474,8 +489,16 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12343</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
@@ -506,8 +529,16 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12344</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
@@ -538,8 +569,16 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12345</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
 
 		"            <IsLeadPax>true</IsLeadPax>\n" +
@@ -571,11 +610,17 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12346</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
-
-
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -605,10 +650,17 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12347</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
-
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -638,11 +690,17 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12348</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
-
-
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -672,11 +730,17 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12349</IdNumber>\n" +
-		"              <IdentityCardExpiryDate>2035-07-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>2019-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"            </IdDetails>\n" +
-
-
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -688,10 +752,17 @@ const XSLTconstant = {
 		"            <CountryName>India</CountryName>\n" +
 		"            <Nationality>IN</Nationality>\n" +
 		"          </Nationality>\n" +
-		"          <PassportExpiry>2030-12-31T00:00:00</PassportExpiry>\n" +
+		"          <PassportExpiry>" + (currentYear + 10) + "-01-01T00:00:00</PassportExpiry>\n" +
 		"          <PassportIssueCity>Delhi</PassportIssueCity>\n" +
 		"          <PassportIssueCountryCode>IN</PassportIssueCountryCode>\n" +
-		"          <PassportIssueDate>2020-12-31T00:00:00</PassportIssueDate>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <PassportIssueDate>" + (infantAge + 1) + "-01-01T00:00:00</PassportIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <PassportIssueDate>" + (currentYear - 8) + "-01-01T00:00:00</PassportIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
 		"          <PassportNo>123456</PassportNo>\n" +
 		"          <PaxBaggage>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
@@ -979,10 +1050,16 @@ const XSLTconstant = {
 		+ "					</SegmentDetails>\r\n"
 		+ "				</xsl:for-each>\r\n"
 		+ "			</SegmentDetails>\r\n"
-		+ "          <Tax>\r\n"
-		+ "            <!--<xsl:value-of select=\"Tax\"/>-->\r\n"
-		+ "            <xsl:value-of select=\"sum(TaxList/TaxBreakUp/Amount)\"/>\r\n"
-		+ "          </Tax>\r\n"
+		+ "         <Tax>\r\n"
+		+ "         <xsl:choose>\r\n"
+		+ "          <xsl:when test=\"count(TaxList/TaxBreakUp) &gt; 0\">\r\n"
+		+ "          <xsl:value-of select=\"sum(TaxList/TaxBreakUp/Amount)\"/>\r\n"
+		+ "         </xsl:when>\r\n"
+		+ "         <xsl:otherwise>\r\n"
+		+ "         <xsl:value-of select=\"Tax\"/>\r\n"
+		+ "         </xsl:otherwise>\r\n"
+		+ "         </xsl:choose>\r\n"
+		+ "         </Tax>\r\n"
 		+ "          <TaxList>\r\n"
 		+ "            <xsl:if test=\"count(TaxList/TaxBreakUp) &gt; 0\">\r\n"
 		+ "              <xsl:for-each select=\"TaxList/TaxBreakUp\">\r\n"
@@ -1128,6 +1205,7 @@ const XSLTconstant = {
 		+ "            <FlightNumber>\r\n"
 		+ "              <xsl:value-of select=\"FlightNumber\"/>\r\n"
 		+ "            </FlightNumber>\r\n"
+		+ "            <FlightRef><xsl:value-of select=\"FlightRef\"/></FlightRef>\r\n"
 		+ "            <FlightStatus>Confirmed</FlightStatus>\r\n"
 		+ "            <xsl:if test=\"string-length(MarriageGrpInd) > 0\">\r\n"
 		+ "                <MarriageGrpInd>\r\n"
