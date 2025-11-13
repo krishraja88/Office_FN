@@ -153,20 +153,6 @@ function transformSearch(searchResultSet, stepName) {
     return new XMLSerializer().serializeToString(transformedDoc);
 }
 
-function generateRandomTimestamp1() {
-	let now = new Date();
-	let dd = String(now.getDate()).padStart(2, '0');
-	//let mm = String(now.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-	//let yy = String(now.getFullYear()).slice(-2);
-	let hh = String(now.getHours()).padStart(2, '0');
-	let ss = String(now.getSeconds()).padStart(2, '0');
-	let ff = String(now.getMilliseconds()).padStart(3, '0');
-
-	// Combine into ddmmyyhhssff + random 3 digits to ensure uniqueness
-	//let randomPart = Math.floor(Math.random() * 900 + 100); // 3-digit random
-	return dd + hh + ss + ff; //dd + mm + yy + hh + ss + ff + randomPart;
-}
-
 function generateRandomTimestamp() {
 	return Math.floor(10000000 + Math.random() * 90000000);
 }
@@ -396,11 +382,14 @@ const XSLTconstant = {
 		"              <DateOfBirth>" + AdultAge + "-01-01T00:00:00</DateOfBirth>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
+		"		<xsl:if test=\"$loopIndex=string('1')\">\n" +
+		"            <xsl:variable name=\"FirstName\">Raju</xsl:variable>\n" +
+		"            <xsl:variable name=\"LastName\">Kumar</xsl:variable>\n" +
 		"		 <DocumentDetails>\n" +
 		"		   <FlightPassenger.PassengerIdDetail>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
-		"              <IdNumber>12345678</IdNumber>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() +"</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
 		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
@@ -420,9 +409,7 @@ const XSLTconstant = {
 		"          <FFNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </FFNumber>\n" +
-		"			      <xsl:if test=\"$loopIndex=string('1')\">\n" +
-		"            <xsl:variable name=\"FirstName\">Raju</xsl:variable>\n" +
-		"            <xsl:variable name=\"LastName\">Kumar</xsl:variable>\n" +
+
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -449,6 +436,30 @@ const XSLTconstant = {
 		"          <xsl:if test=\"$loopIndex=string('2')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Darpan</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Gupta</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -475,6 +486,30 @@ const XSLTconstant = {
 		"          <xsl:if test=\"$loopIndex=string('3')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Pankaj</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Kumar</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -498,9 +533,33 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('4')\">\n" +
+		"     <xsl:if test=\"$loopIndex=string('4')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Ayush</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Jain</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -524,9 +583,33 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('5')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('5')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Vishal</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Dua</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -550,9 +633,33 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('6')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('6')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Mahendra Singh</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Dhoni</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -576,9 +683,33 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('7')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('7')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Rajesh</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Kumar</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -602,9 +733,33 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('8')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('8')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Manisha</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Gupta</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -628,9 +783,33 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('9')\">\n" +
+		"      <xsl:if test=\"$loopIndex=string('9')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Virat</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Kohli</xsl:variable>\n" +
+		"		 <DocumentDetails>\n" +
+		"		   <FlightPassenger.PassengerIdDetail>\n" +
+		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
+		"              <IdCardType>Passport</IdCardType>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
+		"              <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"		   </FlightPassenger.PassengerIdDetail>\n" +
+		"		 </DocumentDetails>\n" +
+		"          <Email>uapi_air_test@tbo.com</Email>\n" +
+		"          <FFAirline>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFAirline>\n" +
+		"          <FFNumber>\n" +
+		"            <xsl:value-of select=\"''\"/>\n" +
+		"          </FFNumber>\n" +
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -671,7 +850,7 @@ const XSLTconstant = {
 		"              <PassportIssueDate>" + (currentYear - 8) + "-01-01T00:00:00</PassportIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
-		"          <PassportNo>123456</PassportNo>\n" +
+		"          <PassportNo>" + generateRandomTimestamp() +"</PassportNo>\n" +
 		"          <PaxBaggage>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </PaxBaggage>\n" +
