@@ -153,12 +153,22 @@ function transformSearch(searchResultSet, stepName) {
     return new XMLSerializer().serializeToString(transformedDoc);
 }
 
-function GetPassportRandomNumber() {
-	const random = 0;
-	random = new 
+function generateRandomTimestamp1() {
+	let now = new Date();
+	let dd = String(now.getDate()).padStart(2, '0');
+	//let mm = String(now.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+	//let yy = String(now.getFullYear()).slice(-2);
+	let hh = String(now.getHours()).padStart(2, '0');
+	let ss = String(now.getSeconds()).padStart(2, '0');
+	let ff = String(now.getMilliseconds()).padStart(3, '0');
 
+	// Combine into ddmmyyhhssff + random 3 digits to ensure uniqueness
+	//let randomPart = Math.floor(Math.random() * 900 + 100); // 3-digit random
+	return dd + hh + ss + ff; //dd + mm + yy + hh + ss + ff + randomPart;
+}
 
-	return random;
+function generateRandomTimestamp() {
+	return Math.floor(10000000 + Math.random() * 90000000);
 }
 
 const XSLTconstant = {
@@ -390,7 +400,7 @@ const XSLTconstant = {
 		"		   <FlightPassenger.PassengerIdDetail>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
-		"              <IdNumber>12341</IdNumber>\n" +
+		"              <IdNumber>12345678</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
 		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
