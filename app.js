@@ -933,38 +933,50 @@ const XSLTconstant = {
 		"            <YQTax>0</YQTax>\n" +
 		"          </Price>\n" +
 		"          <Seat />\n" +
-		"			<SegmentDetails>\r\n" +
 		"				<xsl:for-each select=\"SegmentDetails/SegmentDetails\">\r\n" +
 		"					<SegmentDetails>\r\n" +
-		"						<FareBasis>\r\n" +
-		"							<xsl:value-of select=\"FareBasis\"/>\r\n" +
-		"						</FareBasis>\r\n" +
 		"						<xsl:if test=\"CabinBaggage/Value != ''\">\r\n" +
 		"							<CabinBaggage>\r\n" +
-		"								<Value>\r\n" +
-		"									<xsl:value-of select=\"CabinBaggage/Value\"/>\r\n" +
-		"								</Value>\r\n" +
+		"								<FreeText>\r\n" +
+		"									<xsl:value-of select=\"CabinBaggage/FreeText\"/>\r\n" +
+		"								</FreeText>\r\n" +
+		"								<NoOfPiece>\r\n" +
+		"									<xsl:value-of select=\"CabinBaggage/NoOfPiece\"/>\r\n" +
+		"								</NoOfPiece>\r\n" +
 		"								<Unit>\r\n" +
 		"									<xsl:value-of select=\"CabinBaggage/Unit\"/>\r\n" +
 		"								</Unit>\r\n" +
+		"								<Value>\r\n" +
+		"									<xsl:value-of select=\"CabinBaggage/Value\"/>\r\n" +
+		"								</Value>\r\n" +
 		"							</CabinBaggage>\r\n" +
 		"						</xsl:if>\r\n" +
 		"						<xsl:if test=\"CheckedInBaggage/Value != ''\">\r\n" +
 		"							<CheckedInBaggage>\r\n" +
-		"								<Value>\r\n" +
-		"									<xsl:value-of select=\"CheckedInBaggage/Value\"/>\r\n" +
-		"								</Value>\r\n" +
+		"								<FreeText>\r\n" +
+		"									<xsl:value-of select=\"CheckedInBaggage/FreeText\"/>\r\n" +
+		"								</FreeText>\r\n" +
+		"								<NoOfPiece>\r\n" +
+		"									<xsl:value-of select=\"CheckedInBaggage/NoOfPiece\"/>\r\n" +
+		"								</NoOfPiece>\r\n" +
 		"								<Unit>\r\n" +
 		"									<xsl:value-of select=\"CheckedInBaggage/Unit\"/>\r\n" +
 		"								</Unit>\r\n" +
+		"								<Value>\r\n" +
+		"									<xsl:value-of select=\"CheckedInBaggage/Value\"/>\r\n" +
+		"								</Value>\r\n" +
 		"							</CheckedInBaggage>\r\n" +
 		"						</xsl:if>\r\n" +
-		"						<SegRef>\r\n" +
-		"							<xsl:value-of select=\"SegRef\"/>\r\n" +
-		"						</SegRef>\r\n" +
+		"						<FareBasis>\r\n" +
+		"							<xsl:value-of select=\"FareBasis\"/>\r\n" +
+		"						</FareBasis>\r\n" +
+		"						<FlightInfoIndex>\r\n" +
+		"							<xsl:value-of select=\"FlightInfoIndex\"/>\r\n" +
+		"						</FlightInfoIndex>\r\n" +
 		"					</SegmentDetails>\r\n" +
 		"				</xsl:for-each>\r\n" +
 		"			</SegmentDetails>\r\n" +
+    
 		"          <TicketNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </TicketNumber>\n" +
@@ -1116,32 +1128,44 @@ const XSLTconstant = {
 		+ "			<SegmentDetails>\r\n"
 		+ "				<xsl:for-each select=\"SegmentDetails/SegmentDetails\">\r\n"
 		+ "					<SegmentDetails>\r\n"
-		+ "						<FareBasis>\r\n"
-		+ "							<xsl:value-of select=\"FareBasis\"/>\r\n"
-		+ "						</FareBasis>\r\n"
 		+ "						<xsl:if test=\"CabinBaggage/Value != ''\">\r\n"
 		+ "							<CabinBaggage>\r\n"
-		+ "								<Value>\r\n"
-		+ "									<xsl:value-of select=\"CabinBaggage/Value\"/>\r\n"
-		+ "								</Value>\r\n"
+		+ "								<FreeText>\r\n"
+		+ "									<xsl:value-of select=\"CabinBaggage/FreeText\"/>\r\n"
+		+ "								</FreeText>\r\n"
+		+ "								<NoOfPiece>\r\n"
+		+ "									<xsl:value-of select=\"CabinBaggage/NoOfPiece\"/>\r\n"
+		+ "								</NoOfPiece>\r\n"
 		+ "								<Unit>\r\n"
 		+ "									<xsl:value-of select=\"CabinBaggage/Unit\"/>\r\n"
 		+ "								</Unit>\r\n"
+		+ "								<Value>\r\n"
+		+ "									<xsl:value-of select=\"CabinBaggage/Value\"/>\r\n"
+		+ "								</Value>\r\n"
 		+ "							</CabinBaggage>\r\n"
 		+ "						</xsl:if>\r\n"
 		+ "						<xsl:if test=\"CheckedInBaggage/Value != ''\">\r\n"
 		+ "							<CheckedInBaggage>\r\n"
-		+ "								<Value>\r\n"
-		+ "									<xsl:value-of select=\"CheckedInBaggage/Value\"/>\r\n"
-		+ "								</Value>\r\n"
+		+ "								<FreeText>\r\n"
+		+ "									<xsl:value-of select=\"CheckedInBaggage/FreeText\"/>\r\n"
+		+ "								</FreeText>\r\n"
+		+ "								<NoOfPiece>\r\n"
+		+ "									<xsl:value-of select=\"CheckedInBaggage/NoOfPiece\"/>\r\n"
+		+ "								</NoOfPiece>\r\n"
 		+ "								<Unit>\r\n"
 		+ "									<xsl:value-of select=\"CheckedInBaggage/Unit\"/>\r\n"
 		+ "								</Unit>\r\n"
+		+ "								<Value>\r\n"
+		+ "									<xsl:value-of select=\"CheckedInBaggage/Value\"/>\r\n"
+		+ "								</Value>\r\n"
 		+ "							</CheckedInBaggage>\r\n"
 		+ "						</xsl:if>\r\n"
-		+ "						<SegRef>\r\n"
-		+ "							<xsl:value-of select=\"SegRef\"/>\r\n"
-		+ "						</SegRef>\r\n"
+		+ "						<FareBasis>\r\n"
+		+ "							<xsl:value-of select=\"FareBasis\"/>\r\n"
+		+ "						</FareBasis>\r\n"
+		+ "						<FlightInfoIndex>\r\n"
+		+ "							<xsl:value-of select=\"FlightInfoIndex\"/>\r\n"
+		+ "						</FlightInfoIndex>\r\n"
 		+ "					</SegmentDetails>\r\n"
 		+ "				</xsl:for-each>\r\n"
 		+ "			</SegmentDetails>\r\n"
