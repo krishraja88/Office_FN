@@ -933,6 +933,7 @@ const XSLTconstant = {
 		"            <YQTax>0</YQTax>\n" +
 		"          </Price>\n" +
 		"          <Seat />\n" +
+		"			<SegmentDetails>\r\n" +
 		"				<xsl:for-each select=\"SegmentDetails/SegmentDetails\">\r\n" +
 		"					<SegmentDetails>\r\n" +
 		"						<xsl:if test=\"CabinBaggage/Value != ''\">\r\n" +
@@ -975,8 +976,7 @@ const XSLTconstant = {
 		"						</FlightInfoIndex>\r\n" +
 		"					</SegmentDetails>\r\n" +
 		"				</xsl:for-each>\r\n" +
-		"			</SegmentDetails>\r\n" +
-    
+		"			</SegmentDetails>\r\n" +    
 		"          <TicketNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </TicketNumber>\n" +
