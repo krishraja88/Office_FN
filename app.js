@@ -858,7 +858,7 @@ const XSLTconstant = {
 		"              <PassportIssueDate>" + (currentYear - 8) + "-01-01T00:00:00</PassportIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
-		"          <PassportNo>" + generateRandomTimestamp() +"</PassportNo>\n" +
+		"          <PassportNo>" + generateRandomTimestamp() + "<xsl:value-of select=\"$loopIndex\"/>" + "</PassportNo>\n" +
 		"          <PaxBaggage>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </PaxBaggage>\n" +
