@@ -1,7 +1,7 @@
 // import { XSLTProcessor } from 'xslt-processor';
 // import { DOMParser, XMLSerializer } from 'xmldom';
 
-document.querySelector('.btn.btn-primary').addEventListener('click',bracketRemove);
+document.querySelector('.btn.btn-primary').addEventListener('click', bracketRemove);
 document.querySelector('.btn.btn-success').addEventListener('click', sr);
 document.querySelector('.btn.btn-warning').addEventListener('click', fQTransform);
 document.querySelector('.btn.btn-light').addEventListener('click', fQTransformOnly);
@@ -24,108 +24,107 @@ var infIssueDate =
 	"T00:00:00";
 
 async function ClearRespose() {
-document.querySelector('.form-control.output').value="";
+	document.querySelector('.form-control.output').value = "";
 
 }
 async function ClearAlls() {
-	document.querySelector('.form-control.input').value="";
-	document.querySelector('.form-control.output').value="";
+	document.querySelector('.form-control.input').value = "";
+	document.querySelector('.form-control.output').value = "";
 }
 
-async function bracketRemove(){
-    let input = document.querySelector('.form-control.input').value;
-    let output = document.querySelector('.form-control.output');
+async function bracketRemove() {
+	let input = document.querySelector('.form-control.input').value;
+	let output = document.querySelector('.form-control.output');
 
-    input = input.replaceAll("&gt;", ">");
-    input = input.replaceAll("&lt;", "<");
-    input = input.replaceAll("&#xD;", "");
-    
-    // output.value = input;
-    // await copySessionId();
+	input = input.replaceAll("&gt;", ">");
+	input = input.replaceAll("&lt;", "<");
+	input = input.replaceAll("&#xD;", "");
 
-    let firstIndex = input.indexOf("<SessionId>")+11;
-    let lastIndex = input.indexOf("</SessionId>");
+	// output.value = input;
+	// await copySessionId();
 
-    await navigator.clipboard.writeText(input.substring(firstIndex, lastIndex));
+	let firstIndex = input.indexOf("<SessionId>") + 11;
+	let lastIndex = input.indexOf("</SessionId>");
 
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 500ms
+	await navigator.clipboard.writeText(input.substring(firstIndex, lastIndex));
 
-    output.value = input;
+	await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 500ms
 
-    await copy(); 
+	output.value = input;
+
+	await copy();
 }
 
 async function sr() {
 
-    let input = document.querySelector('.form-control.input').value;
-    let output = document.querySelector('.form-control.output');
+	let input = document.querySelector('.form-control.input').value;
+	let output = document.querySelector('.form-control.output');
 
-    input = input.replaceAll("&gt;", ">");
-    input = input.replaceAll("&lt;", "<");
-    input = input.replaceAll("&#xD;", "");
-    
-    // output.value = input;
-    // await copySessionId();
-    
-	let fi = input.indexOf("<SessionId>")+11;
-    let li = input.indexOf("</SessionId>");
+	input = input.replaceAll("&gt;", ">");
+	input = input.replaceAll("&lt;", "<");
+	input = input.replaceAll("&#xD;", "");
 
-    await navigator.clipboard.writeText(input.substring(fi, li));
+	// output.value = input;
+	// await copySessionId();
 
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 500ms
+	let fi = input.indexOf("<SessionId>") + 11;
+	let li = input.indexOf("</SessionId>");
 
-    let firstIndex = input.indexOf("<SearchResult>");
-    let lastIndex = input.indexOf("</SearchResult>") + 15;
-
-    firstIndex!=-1 ? input = input.substring(firstIndex, lastIndex) : input = "No Search Result Found";
-
-    output.value = input;
-
-    await copy(); 
-}
-
-async function copy() {
-    let output = document.querySelector('.form-control.output');
-    await navigator.clipboard.writeText(output.value);
-}
-
-async function copySessionId()
-{
-    let output = document.querySelector('.form-control.output');
-    let firstIndex = output.value.indexOf("<SessionId>")+11;
-    let lastIndex = output.value.indexOf("</SessionId>");
-
-    await navigator.clipboard.writeText(output.value.substring(firstIndex, lastIndex));
-}
-
-async function fQTransform(){
-	await sr();
-
-    let input = document.querySelector('.form-control.output').value;
-    let output = document.querySelector('.form-control.output');
-
-    input = transformSearch(input, "Farequote")
+	await navigator.clipboard.writeText(input.substring(fi, li));
 
 	await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 500ms
 
-    output.value = input;
-    await copy(); 
+	let firstIndex = input.indexOf("<SearchResult>");
+	let lastIndex = input.indexOf("</SearchResult>") + 15;
+
+	firstIndex != -1 ? input = input.substring(firstIndex, lastIndex) : input = "No Search Result Found";
+
+	output.value = input;
+
+	await copy();
 }
 
-async function fQTransformOnly(){
-    let input = document.querySelector('.form-control.input').value;
-    let output = document.querySelector('.form-control.output');
-
-    output.value = transformSearch(input, "Farequote")
-
-    await copy(); 
+async function copy() {
+	let output = document.querySelector('.form-control.output');
+	await navigator.clipboard.writeText(output.value);
 }
 
-async function bookTransform(){
-    let input = document.querySelector('.form-control.input').value;
-    let output = document.querySelector('.form-control.output');
+async function copySessionId() {
+	let output = document.querySelector('.form-control.output');
+	let firstIndex = output.value.indexOf("<SessionId>") + 11;
+	let lastIndex = output.value.indexOf("</SessionId>");
 
-    output.value = transformSearch(input, "Book")
+	await navigator.clipboard.writeText(output.value.substring(firstIndex, lastIndex));
+}
+
+async function fQTransform() {
+	await sr();
+
+	let input = document.querySelector('.form-control.output').value;
+	let output = document.querySelector('.form-control.output');
+
+	input = transformSearch(input, "Farequote")
+
+	await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 500ms
+
+	output.value = input;
+	await copy();
+}
+
+async function fQTransformOnly() {
+	let input = document.querySelector('.form-control.input').value;
+	let output = document.querySelector('.form-control.output');
+
+	output.value = transformSearch(input, "Farequote")
+
+	await copy();
+}
+
+async function bookTransform() {
+	let input = document.querySelector('.form-control.input').value;
+	let output = document.querySelector('.form-control.output');
+
+	output.value = transformSearch(input, "Book")
 	await copy();
 }
 
@@ -135,30 +134,30 @@ function transformSearch(searchResultSet, stepName) {
 	const parser = new DOMParser();
 	const serializer = new XMLSerializer();
 
-    // Define the XSLT code
-    let xsltCode = '';
-    switch (stepName) {
-        case "Book":
-            xsltCode = XSLTconstant.BookXslt; // XSLT for 'Book' step
-            break;
-        case "Farequote":
-            xsltCode = XSLTconstant.FarequoteXslt; // XSLT for 'Farequote' step
-            break;
-    }
+	// Define the XSLT code
+	let xsltCode = '';
+	switch (stepName) {
+		case "Book":
+			xsltCode = XSLTconstant.BookXslt; // XSLT for 'Book' step
+			break;
+		case "Farequote":
+			xsltCode = XSLTconstant.FarequoteXslt; // XSLT for 'Farequote' step
+			break;
+	}
 
-    // Parse the XSLT and XML content
-    const xsltDoc = new DOMParser().parseFromString(xsltCode, 'application/xml');
-    const xmlDoc = new DOMParser().parseFromString(`<SearchResult>${searchResultSet.replace(/i:nil="true"/g, '')}</SearchResult>`, 'application/xml');
+	// Parse the XSLT and XML content
+	const xsltDoc = new DOMParser().parseFromString(xsltCode, 'application/xml');
+	const xmlDoc = new DOMParser().parseFromString(`<SearchResult>${searchResultSet.replace(/i:nil="true"/g, '')}</SearchResult>`, 'application/xml');
 
-    // Create a new XSLT processor
-    const xsltProcessor = new XSLTProcessor();
-    xsltProcessor.importStylesheet(xsltDoc);
+	// Create a new XSLT processor
+	const xsltProcessor = new XSLTProcessor();
+	xsltProcessor.importStylesheet(xsltDoc);
 
-    // Apply transformation
-    const transformedDoc = xsltProcessor.transformToDocument(xmlDoc);
+	// Apply transformation
+	const transformedDoc = xsltProcessor.transformToDocument(xmlDoc);
 
-    // Serialize the transformed document back to a string
-    return new XMLSerializer().serializeToString(transformedDoc);
+	// Serialize the transformed document back to a string
+	return new XMLSerializer().serializeToString(transformedDoc);
 }
 
 function generateRandomTimestamp() {
@@ -179,8 +178,8 @@ const XSLTconstant = {
 		"    <xsl:variable name=\"currency\" select=\"//SearchResult/Currency\" />\n" +
 		"    \n" +
 		"    <xsl:variable name=\"responseParams\">\n" +
-        "    <xsl:copy-of select=\"//SearchResult/ResponseParams/*\"/>\n" +
-        "    </xsl:variable>\n"+
+		"    <xsl:copy-of select=\"//SearchResult/ResponseParams/*\"/>\n" +
+		"    </xsl:variable>\n" +
 		"    \n" +
 		"    <xsl:variable name=\"segments\">\n" +
 		"    <xsl:copy-of select=\"//SearchResult/Flights/ArrayOfFlightInfo/FlightInfo\"/>\n" +
@@ -397,7 +396,7 @@ const XSLTconstant = {
 		"		   <FlightPassenger.PassengerIdDetail>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
-		"              <IdNumber>" + generateRandomTimestamp() +"</IdNumber>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
 		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
@@ -976,7 +975,7 @@ const XSLTconstant = {
 		"						</FlightInfoIndex>\r\n" +
 		"					</SegmentDetails>\r\n" +
 		"				</xsl:for-each>\r\n" +
-		"			</SegmentDetails>\r\n" +    
+		"			</SegmentDetails>\r\n" +
 		"          <TicketNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </TicketNumber>\n" +
@@ -1491,13 +1490,29 @@ const XSLTconstant = {
 		+ "          <xsl:value-of select=\"sum(//SearchResult/FareBreakdown/Fare/YQTax)\"/>\r\n"
 		+ "        </YQTax>\r\n"
 		+ "      </Price>\r\n"
-		+ "      <PrivateResultID>1</PrivateResultID>\r\n"
-		+ "      <PromoCode></PromoCode>\r\n"
-		+ "      <PromoCodeWarningText></PromoCodeWarningText>\r\n"
+		+ "      <xsl:if test=\"//SearchResult/PricingKeyDetail\">\r\n"
+		+ "        <PricingKeyDetail>\r\n"
+		+ "          <Airline>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/Airline\"/>\r\n"
+		+ "          </Airline>\r\n"
+		+ "          <Key>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/Key\"/>\r\n"
+		+ "          </Key>\r\n"
+		+ "          <ResultCount>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/ResultCount\"/>\r\n"
+		+ "          </ResultCount>\r\n"
+		+ "          <Source>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/Source\"/>\r\n"
+		+ "          </Source>\r\n"
+		+ "        </PricingKeyDetail>\r\n"
+		+ "      </xsl:if>\r\n"
 		+ "      <ResultBookingSource>\r\n"
 		+ "        <xsl:value-of select=\"//SearchResult/ResultBookingSource\"/>\r\n"
 		+ "      </ResultBookingSource>\r\n"
-		+ "<ResultId xmlns:arr=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">\r\n"
+		+ "      <PrivateResultID>1</PrivateResultID>\r\n"
+		+ "      <PromoCode></PromoCode>\r\n"
+		+ "      <PromoCodeWarningText></PromoCodeWarningText>\r\n"
+		+ "	<ResultId xmlns:arr=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">\r\n"
 		+ "    <arr:int>\r\n"
 		+ "        <xsl:value-of select=\"//SearchResult/ResultId/int\"/>\r\n"
 		+ "    </arr:int>\r\n"
