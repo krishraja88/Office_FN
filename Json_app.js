@@ -647,7 +647,7 @@ async function jsonSearchToFqReqJson() {
 		const sessionId = parsed.SessionId || parsed.sessionId || parsed.session_id || '';
 
 		if (sessionId) {
-			try { await navigator.clipboard.writeText(sessionId); } catch (_) {}
+			try { await navigator.clipboard.writeText(sessionId); } catch (_) { }
 			await new Promise(r => setTimeout(r, 150));
 			await new Promise(r => setTimeout(r, 1000));
 		}
@@ -703,13 +703,12 @@ function resolvePassengerTypeLabel(fareRow) {
 function extractFareBreakdownRows(source) {
 	if (!source || typeof source !== 'object') return [];
 
+	const fareBreakup = source.FareBreakupDetails?.[0] || source.fareBreakupDetails?.[0];
 	const candidates = [
 		source.FareBreakdown,
 		source.fareBreakdown,
-		source.FareBreakupDetails?.[0]?.FareBreakdown,
-		source.FareBreakupDetails?.[0]?.fareBreakdown,
-		source.fareBreakupDetails?.[0]?.FareBreakdown,
-		source.fareBreakupDetails?.[0]?.fareBreakdown
+		fareBreakup?.FareBreakdown,
+		fareBreakup?.fareBreakdown
 	];
 
 	for (const candidate of candidates) {
@@ -722,13 +721,16 @@ function extractFareBreakdownRows(source) {
 				first.PassengerType != null || first.passengerType != null
 				|| first.Type != null || first.type != null
 				|| first.PassengerCount != null || first.passengerCount != null
-				|| first.BaseFare != null || first.baseFare != null
-			);
+			) && (
+					first.Source == null && first.source == null
+					&& first.FareKey == null && first.fareKey == null
+					&& first.AirProductDetails == null && first.airProductDetails == null
+				);
 			if (looksLikeFareRow) return candidate;
 
 			const nestedFares = candidate.flatMap((item) => {
 				if (!item || typeof item !== 'object') return [];
-				const fares = item.Fare ?? item.fare;
+				const fares = item.Fare ?? item.fare ?? item.FareBreakdown ?? item.fareBreakdown;
 				return Array.isArray(fares) ? fares : (fares ? [fares] : []);
 			});
 			if (nestedFares.length) return nestedFares;
@@ -746,11 +748,25 @@ function extractFareBreakdownRows(source) {
 }
 
 function dateOfBirthForPassengerType(passengerType) {
+
 	const normalizedType = String(passengerType || '').trim().toLowerCase();
-	if (normalizedType === 'infant') return `${infantAge}-07-01T00:00:00Z`;
-	if (normalizedType === 'child') return '2020-01-01T00:00:00Z';
-	if (normalizedType === 'senior') return '1962-01-01T00:00:00Z';
+	if (normalizedType === 'infant' || normalizedType === 'inf') return `${infantAge}-07-01T00:00:00Z`;
+	else if (normalizedType === 'child' || normalizedType === 'chd') return `${currentYear - 7}-01-01T00:00:00Z`;
+	else if (normalizedType === 'adult' || normalizedType === 'adt') return `${currentYear - 25}-01-01T00:00:00Z`;
+	else if (normalizedType === 'senior' || normalizedType === 'adt') return `${currentYear - 60}-01-01T00:00:00Z`;
 	return '1990-05-15T00:00:00Z';
+}
+
+function identityCardIssueDateForPassengerType(passengerType) {
+	const normalizedType = String(passengerType || '').trim().toLowerCase();
+	if (normalizedType === 'infant' || normalizedType === 'inf') {
+		return `${currentYear - 1}-01-01T00:00:00Z`;
+	}
+	return `${currentYear - 5}-01-01T00:00:00Z`;
+}
+
+function identityCardExpiryDateForPassengerType(passengerType) {
+	return `${currentYear + 10}-01-01T00:00:00Z`;
 }
 
 const SAMPLE_PASSENGER_NAMES = [
@@ -868,8 +884,6 @@ function buildPassengerFromFareRow(fareRow, options) {
 		fare,
 		segments,
 		airlineCode,
-		firstApd,
-		firstSeg,
 		cancelPenalty,
 		isLeadPax,
 		passengerIndex
@@ -891,6 +905,16 @@ function buildPassengerFromFareRow(fareRow, options) {
 	const passengerType = resolvePassengerTypeLabel(fareRow);
 	const nameInfo = passengerNameForIndex(passengerIndex);
 
+	if (passengerIndex == 0) {
+		let randomString = '';
+		while (randomString.length < 4) {
+			randomString += Math.random().toString(36).replace(/[^a-z]/g, '');
+		}
+		randomString = randomString.substring(0, 4);
+		nameInfo.firstName = nameInfo.firstName + randomString;
+		nameInfo.lastName = nameInfo.lastName + randomString;
+	}
+
 	return {
 		FirstName: nameInfo.firstName,
 		LastName: nameInfo.lastName,
@@ -900,7 +924,7 @@ function buildPassengerFromFareRow(fareRow, options) {
 		IsLeadPax: isLeadPax,
 		DateOfBirth: dateOfBirthForPassengerType(passengerType),
 		Type: resolveBookPassengerType(fareRow),
-		PassportNo: `${passportNumber() }`,
+		PassportNo: `${passportNumber()}`,
 		Nationality: 'IN',
 		City: 'New Delhi',
 		AddressLine1: '123 MG Road',
@@ -909,7 +933,7 @@ function buildPassengerFromFareRow(fareRow, options) {
 		PaxBaggage: [],
 		PaxMeal: [],
 		PaxSeat: [],
-		PaxSSRService :[],
+		PaxSSRService: [],
 		Email: 'rahul.sharma@example.com',
 		Meal: { Code: 'VGML', Description: 'Vegetarian Meal' },
 		PaxPreference: { Code: 'WHEELCHAIR', Description: 'Wheelchair required' },
@@ -945,18 +969,18 @@ function buildPassengerFromFareRow(fareRow, options) {
 		FFNumber: 'FF123456',
 		PaxKey: `PAX-${paxId}`,
 		PaxKeyRef: `REF-${paxId}`,
-		PassportExpiry: '2030-12-31T00:00:00Z',
+		PassportExpiry: identityCardExpiryDateForPassengerType(passengerType),
 		TicketNumber: '',
 		FlightBoardedStatus: [],
 		PostalCode: '110001',
 		IdDetails: {
 			IdCardCode: 'PP',
-			IdNumber: 'A1234567',
+			IdNumber: `${passportNumber()}`,
 			AlphaCheck: '',
 			ZipCode: '110001',
 			DiscountCode: '',
-			IdentityCardIssueDate: '2020-01-01T00:00:00Z',
-			IdentityCardExpiryDate: '2030-12-31T00:00:00Z',
+			IdentityCardIssueDate: identityCardIssueDateForPassengerType(passengerType),
+			IdentityCardExpiryDate: identityCardExpiryDateForPassengerType(passengerType),
 			DocumentIssuingCountry: 'IN',
 			IdCardType: 'Passport',
 			IdProofPath: ''
@@ -974,7 +998,7 @@ function buildPassengerFromFareRow(fareRow, options) {
 		PassportIssueIsoCountryCode: 'IN',
 		PassportIssueCity: 'New Delhi',
 		HesCode: '',
-		PassportIssueDate: '2020-01-15T00:00:00Z',
+		PassportIssueDate: identityCardIssueDateForPassengerType(passengerType),
 		GSTNumber: '22AAAAA0000A1Z5',
 		GSTContactNumber: '9876543210',
 		GSTName: 'ABC Travels',
@@ -1015,7 +1039,7 @@ async function jsonFqRespToBookReqJson() {
 		const sessionId = parsed.SessionId || parsed.sessionId || parsed.session_id || '';
 
 		if (sessionId) {
-			try { await navigator.clipboard.writeText(sessionId); } catch (_) {}
+			try { await navigator.clipboard.writeText(sessionId); } catch (_) { }
 			await new Promise(r => setTimeout(r, 150));
 			await new Promise(r => setTimeout(r, 1000));
 		}
@@ -1139,10 +1163,10 @@ const XSLTconstant = {
 		"  </xsl:variable>\n" +
 		"\n" +
 		"  <xsl:variable name=\"currency\" select=\"//SearchResult/Currency\" />\n" +
-		"\n" 
-		+"<xsl:variable name=\"responseParams\">\n"
-        +"<xsl:copy-of select=\"//SearchResult/ResponseParams/*\"/>\n"
-        +"</xsl:variable>\n"+
+		"\n"
+		+ "<xsl:variable name=\"responseParams\">\n"
+		+ "<xsl:copy-of select=\"//SearchResult/ResponseParams/*\"/>\n"
+		+ "</xsl:variable>\n" +
 		"\n" +
 		"  <xsl:variable name=\"segments\">\n" +
 		"    <xsl:copy-of select=\"//SearchResult/Flights/ArrayOfFlightInfo/FlightInfo\"/>\n" +
@@ -1202,7 +1226,7 @@ const XSLTconstant = {
 		"    </Endorsement>\n" +
 		"    <ExpectedTotalFare>\n" +
 		"      <xsl:value-of select=\"//SearchResult/TotalFare\"/>\n" +
-		"    </ExpectedTotalFare>\n" 
+		"    </ExpectedTotalFare>\n"
 		+ "      <FareKey>\r\n"
 		+ "        <xsl:value-of select=\"//SearchResult/FareKey\"/>\r\n"
 		+ "      </FareKey>\r\n" +
@@ -1360,15 +1384,15 @@ const XSLTconstant = {
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
 		"              <IdNumber>12345678</IdNumber>\n" +
-		"              <IdNumber>" + generateRandomTimestamp() +"</IdNumber>\n" +
+		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1412,12 +1436,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1461,12 +1485,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1510,12 +1534,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1559,12 +1583,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1608,12 +1632,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1657,12 +1681,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1706,12 +1730,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1755,12 +1779,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (infantAge + 1) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
