@@ -155,6 +155,14 @@ function fareFamilyForIndex(airProductDetails, idx) {
 	return m ? m.fareFamilyCode : '';
 }
 
+function flightRefForIndex(airProductDetails, idx) {
+	const s = String(idx ?? '');
+	const m = (airProductDetails || []).find(
+		(ap) => String(ap.flightInfoIndex ?? ap.FlightInfoIndex) === s
+	);
+	return m ? (m.flightRef ?? m.FlightRef ?? '') : '';
+}
+
 function eachSegment(flights2d, fn) {
 	if (!Array.isArray(flights2d)) return;
 	for (const journey of flights2d) {
@@ -252,7 +260,7 @@ function buildLocationXml(tag, loc) {
 		`</${tag}>`;
 }
 
-function buildFlightInfoXml(seg) {
+function buildFlightInfoXml(seg, airProductDetails) {
 	let s = '<FlightInfo>';
 	const accTicks = seg.accumulatedDurationTicks;
 	if (accTicks > 0) {
@@ -285,7 +293,11 @@ function buildFlightInfoXml(seg) {
 	s += `<ETicketEligible>${et}</ETicketEligible>`;
 	s += `<FlightInfoIndex>${escapeXml(seg.flightInfoIndex)}</FlightInfoIndex>`;
 	s += `<FlightNumber>${escapeXml(seg.flightNumber)}</FlightNumber>`;
-	s += '<FlightRef/>';
+	const flightRef = flightRefForIndex(airProductDetails, seg.flightInfoIndex)
+		|| seg.flightRef || seg.FlightRef || '';
+	s += flightRef.length
+		? `<FlightRef>${escapeXml(flightRef)}</FlightRef>`
+		: '<FlightRef/>';
 	s += `<FlightStatus>${escapeXml(seg.flightStatus || 'Confirmed')}</FlightStatus>`;
 	if (seg.noOfSeatAvailable != null && String(seg.noOfSeatAvailable).length) {
 		s += `<NoOfSeatAvailable>${formatFqNumber(seg.noOfSeatAvailable)}</NoOfSeatAvailable>`;
@@ -313,7 +325,7 @@ function buildFlightInfoXml(seg) {
 	return s;
 }
 
-function buildFlightsXml(flights2d) {
+function buildFlightsXml(flights2d, airProductDetails) {
 	if (!Array.isArray(flights2d) || flights2d.length === 0) {
 		return '<Flights/>';
 	}
@@ -322,7 +334,7 @@ function buildFlightsXml(flights2d) {
 		if (!Array.isArray(journey)) continue;
 		inner += '<ArrayOfFlightInfo>';
 		for (const seg of journey) {
-			inner += buildFlightInfoXml(seg);
+			inner += buildFlightInfoXml(seg, airProductDetails);
 		}
 		inner += '</ArrayOfFlightInfo>';
 	}
@@ -379,7 +391,12 @@ function normalizeSearchJsonToResult(parsed) {
 		throw new Error('JSON must be an object: either a search response with a Results array, or a single search result with fareBreakupDetails.');
 	}
 	if (Array.isArray(parsed.Results) && parsed.Results.length > 0) {
-		return parsed.Results[0];
+		let result = parsed.Results[0];
+		// Full search response: Results is an array of journey groups, each group is an array of results.
+		if (Array.isArray(result) && result.length > 0) {
+			result = result[0];
+		}
+		return result;
 	}
 	const nested = parsed.searchResult ?? parsed.result ?? parsed.data;
 	if (nested && typeof nested === 'object' && !Array.isArray(nested)
@@ -433,10 +450,13 @@ function searchJsonToFareQuoteXml(parsed) {
 	xml += `<Currency>${escapeXml(pricing.currency)}</Currency>`;
 	xml += `<EticketEligible>${eticket}</EticketEligible>`;
 	xml += fareBreakInner;
-	xml += '<FareKey/>';
+	const fareKey = pricing.fareKey ?? pricing.FareKey ?? '';
+	xml += fareKey.length
+		? `<FareKey>${escapeXml(fareKey)}</FareKey>`
+		: '<FareKey/>';
 	xml += buildFareRulesXml(flights2d, airPd);
 	xml += `<FareType>${escapeXml(pricing.fareType || 'PUB')}</FareType>`;
-	xml += buildFlightsXml(flights2d);
+	xml += buildFlightsXml(flights2d, airPd);
 	xml += `<IndexForScreenScrap>${formatFqNumber(pricing.indexForScreenScrap ?? 0)}</IndexForScreenScrap>`;
 	xml += `<IsScreenScrapped>${screenScrap}</IsScreenScrapped>`;
 	xml += `<IssuanceType>${issuance}</IssuanceType>`;
