@@ -16,11 +16,23 @@ const childAge = currentYear - 9;
 const infantAge = currentYear - 1;
 const seniorAge = currentYear - 62;
 const AdultAge = currentYear - 30;
+const ageDate = new Date(infantAge, 7, 1);
+ageDate.setMonth(ageDate.getMonth() + 3);
 
-function generateRandomTimestamp() {
-	return Math.floor(10000000 + Math.random() * 90000000);
+var infIssueDate =
+	ageDate.getFullYear() + "-" +
+	String(ageDate.getMonth() + 1).padStart(2, '0') + "-" +
+	String(ageDate.getDate()).padStart(2, '0') +
+	"T00:00:00";
+
+async function ClearRespose() {
+	document.querySelector('.form-control.output').value = "";
+
 }
-
+async function ClearAlls() {
+	document.querySelector('.form-control.input').value = "";
+	document.querySelector('.form-control.output').value = "";
+}
 
 async function bracketRemove() {
 	let input = document.querySelector('.form-control.input').value;
@@ -1175,24 +1187,24 @@ const XSLTconstant = {
 	BookXslt: "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" +
 		"                 xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
 		"    xmlns:msxsl=\"urn:schemas-microsoft-com:xslt\" exclude-result-prefixes=\"msxsl\">\n" +
-		"  <xsl:output method=\"xml\" indent=\"yes\"/>\n" +
-		"\n" +
-		"\n" +
-		"  <xsl:variable name=\"FareRules\">\n" +
+		"    <xsl:output method=\"xml\" indent=\"yes\"/>\n" +
+		"    \n" +
+		"    \n" +
+		"    <xsl:variable name=\"FareRules\">\n" +
 		"    <xsl:copy-of select=\"//SearchResult/FareRules\"/>\n" +
-		"  </xsl:variable>\n" +
-		"\n" +
-		"  <xsl:variable name=\"currency\" select=\"//SearchResult/Currency\" />\n" +
-		"\n"
-		+ "<xsl:variable name=\"responseParams\">\n"
-		+ "<xsl:copy-of select=\"//SearchResult/ResponseParams/*\"/>\n"
-		+ "</xsl:variable>\n" +
-		"\n" +
-		"  <xsl:variable name=\"segments\">\n" +
+		"    </xsl:variable>\n" +
+		"    \n" +
+		"    <xsl:variable name=\"currency\" select=\"//SearchResult/Currency\" />\n" +
+		"    \n" +
+		"    <xsl:variable name=\"responseParams\">\n" +
+		"    <xsl:copy-of select=\"//SearchResult/ResponseParams/*\"/>\n" +
+		"    </xsl:variable>\n" +
+		"    \n" +
+		"    <xsl:variable name=\"segments\">\n" +
 		"    <xsl:copy-of select=\"//SearchResult/Flights/ArrayOfFlightInfo/FlightInfo\"/>\n" +
-		"  </xsl:variable>\n" +
-		"\n" +
-		"  <xsl:variable name=\"FinalOutput\">\n" +
+		"    </xsl:variable>\n" +
+		"    \n" +
+		"   <xsl:variable name=\"FinalOutput\">\n" +
 		"    <AgencyDetails>\n" +
 		"      <Address>Phase 5, Udyog Vihar, Gurgaon</Address>\n" +
 		"      <AgencyName>ABC Agency Pvt Ltd</AgencyName>\n" +
@@ -1246,10 +1258,10 @@ const XSLTconstant = {
 		"    </Endorsement>\n" +
 		"    <ExpectedTotalFare>\n" +
 		"      <xsl:value-of select=\"//SearchResult/TotalFare\"/>\n" +
-		"    </ExpectedTotalFare>\n"
-		+ "      <FareKey>\r\n"
-		+ "        <xsl:value-of select=\"//SearchResult/FareKey\"/>\r\n"
-		+ "      </FareKey>\r\n" +
+		"    </ExpectedTotalFare>\n" +
+		"      <FareKey>\r\n" +
+		"        <xsl:value-of select=\"//SearchResult/FareKey\"/>\r\n" +
+		"      </FareKey>\r\n" +
 		"    <xsl:copy-of select=\"$FareRules\"/>\n" +
 		"    <FareType>PUB</FareType>\n" +
 		"    <FlightBookingSource>\n" +
@@ -1361,8 +1373,8 @@ const XSLTconstant = {
 		"      <xsl:value-of select=\"//SearchResult/ValidatingAirline\"/>\n" +
 		"    </ValidatingAirlineCode>\n" +
 		"  </xsl:variable>\n" +
-		"\n" +
-		"\n" +
+		"  \n" +
+		"  \n" +
 		"  <xsl:template name=\"loop\">\n" +
 		"    <xsl:param name=\"var\"></xsl:param>\n" +
 		"    <xsl:param name=\"loopIndex\"></xsl:param>\n" +
@@ -1384,16 +1396,16 @@ const XSLTconstant = {
 		"          </xsl:variable>\n" +
 		"          <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <DateOfBirth>2025-07-01T00:00:00</DateOfBirth>\n" +
+		"              <DateOfBirth>" + infantAge + "-07-01T00:00:00</DateOfBirth>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:when test=\"$passengerType=string('Child')\">\n" +
-		"              <DateOfBirth>2020-01-01T00:00:00</DateOfBirth>\n" +
+		"              <DateOfBirth>" + childAge + "-01-01T00:00:00</DateOfBirth>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:when test=\"$passengerType=string('Senior')\">\n" +
-		"              <DateOfBirth>1962-01-01T00:00:00</DateOfBirth>\n" +
+		"              <DateOfBirth>" + seniorAge + "-01-01T00:00:00</DateOfBirth>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
-		"              <DateOfBirth>1990-01-01T00:00:00</DateOfBirth>\n" +
+		"              <DateOfBirth>" + AdultAge + "-01-01T00:00:00</DateOfBirth>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		<xsl:if test=\"$loopIndex=string('1')\">\n" +
@@ -1403,16 +1415,15 @@ const XSLTconstant = {
 		"		   <FlightPassenger.PassengerIdDetail>\n" +
 		"              <DocumentIssuingCountry>IN</DocumentIssuingCountry>\n" +
 		"              <IdCardType>Passport</IdCardType>\n" +
-		"              <IdNumber>12345678</IdNumber>\n" +
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1424,6 +1435,7 @@ const XSLTconstant = {
 		"          <FFNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </FFNumber>\n" +
+
 		"            <FirstName>\n" +
 		"              <xsl:value-of select=\"$FirstName\"/>\n" +
 		"            </FirstName>\n" +
@@ -1441,6 +1453,7 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -1456,12 +1469,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1490,6 +1503,7 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -1505,12 +1519,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1539,12 +1553,13 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('4')\">\n" +
+		"     <xsl:if test=\"$loopIndex=string('4')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Ayush</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Jain</xsl:variable>\n" +
 		"		 <DocumentDetails>\n" +
@@ -1554,12 +1569,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"             <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1588,12 +1603,13 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('5')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('5')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Vishal</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Dua</xsl:variable>\n" +
 		"		 <DocumentDetails>\n" +
@@ -1603,12 +1619,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1637,12 +1653,13 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('6')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('6')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Mahendra Singh</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Dhoni</xsl:variable>\n" +
 		"		 <DocumentDetails>\n" +
@@ -1652,12 +1669,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1686,12 +1703,13 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('7')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('7')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Rajesh</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Kumar</xsl:variable>\n" +
 		"		 <DocumentDetails>\n" +
@@ -1701,12 +1719,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1735,12 +1753,13 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('8')\">\n" +
+		"    <xsl:if test=\"$loopIndex=string('8')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Manisha</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Gupta</xsl:variable>\n" +
 		"		 <DocumentDetails>\n" +
@@ -1750,12 +1769,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1784,12 +1803,13 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Female</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </LastName>\n" +
 		"          </xsl:if>\n" +
-		"          <xsl:if test=\"$loopIndex=string('9')\">\n" +
+		"      <xsl:if test=\"$loopIndex=string('9')\">\n" +
 		"            <xsl:variable name=\"FirstName\">Virat</xsl:variable>\n" +
 		"            <xsl:variable name=\"LastName\">Kohli</xsl:variable>\n" +
 		"		 <DocumentDetails>\n" +
@@ -1799,12 +1819,12 @@ const XSLTconstant = {
 		"              <IdNumber>" + generateRandomTimestamp() + "</IdNumber>\n" +
 		"              <xsl:choose>\n" +
 		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
-		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 1) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardExpiryDate>" + (infantAge + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
+		"              <IdentityCardIssueDate>" + (infIssueDate) + "</IdentityCardIssueDate>\n" +
 		"            </xsl:when>\n" +
 		"            <xsl:otherwise>\n" +
 		"              <IdentityCardExpiryDate>" + (currentYear + 10) + "-01-01T00:00:00</IdentityCardExpiryDate>\n" +
-		"              <IdentityCardIssueDate>" + (currentYear - 5) + "-01-01T00:00:00</IdentityCardIssueDate>\n" +
+		"              <IdentityCardIssueDate>" + (currentYear - 7) + "-07-01T00:00:00</IdentityCardIssueDate>\n" +
 		"            </xsl:otherwise>\n" +
 		"          </xsl:choose>\n" +
 		"		   </FlightPassenger.PassengerIdDetail>\n" +
@@ -1833,6 +1853,7 @@ const XSLTconstant = {
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
 		"            </FullName>\n" +
 		"            <Gender>Male</Gender>\n" +
+		"            <IdDetails />\n" +
 		"            <IsLeadPax>true</IsLeadPax>\n" +
 		"            <LastName>\n" +
 		"              <xsl:value-of select=\"$LastName\"/>\n" +
@@ -1844,11 +1865,18 @@ const XSLTconstant = {
 		"            <CountryName>India</CountryName>\n" +
 		"            <Nationality>IN</Nationality>\n" +
 		"          </Nationality>\n" +
-		"          <PassportExpiry>2030-12-31T00:00:00</PassportExpiry>\n" +
+		"          <PassportExpiry>" + (currentYear + 10) + "-01-01T00:00:00</PassportExpiry>\n" +
 		"          <PassportIssueCity>Delhi</PassportIssueCity>\n" +
 		"          <PassportIssueCountryCode>IN</PassportIssueCountryCode>\n" +
-		"          <PassportIssueDate>2020-12-31T00:00:00</PassportIssueDate>\n" +
-		"          <PassportNo></PassportNo>\n" +
+		"          <xsl:choose>\n" +
+		"            <xsl:when test=\"$passengerType=string('Infant')\">\n" +
+		"              <PassportIssueDate>" + (infIssueDate) + "</PassportIssueDate>\n" +
+		"            </xsl:when>\n" +
+		"            <xsl:otherwise>\n" +
+		"              <PassportIssueDate>" + (currentYear - 8) + "-01-01T00:00:00</PassportIssueDate>\n" +
+		"            </xsl:otherwise>\n" +
+		"          </xsl:choose>\n" +
+		"          <PassportNo>" + generateRandomTimestamp() + "<xsl:value-of select=\"$loopIndex\"/>" + "</PassportNo>\n" +
 		"          <PaxBaggage>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </PaxBaggage>\n" +
@@ -1876,9 +1904,39 @@ const XSLTconstant = {
 		"            <AirlineMealCharges>0</AirlineMealCharges>\n" +
 		"            <AirlineSSRCharges>0</AirlineSSRCharges>\n" +
 		"            <AirlineSeatCharges>0</AirlineSeatCharges>\n" +
+		"           <xsl:choose>\n" +
+		"           <xsl:when test=\"number(Commission) > 0\">\n" +
+		"        <Commission>\n" +
+		"            <xsl:value-of select=\"(./Commission)div(./PassengerCount)\"/>\n" +
+		"        </Commission>\n" +
+		"       </xsl:when>\n" +
+		"       <xsl:otherwise>\n" +
+		"        <Commission>0</Commission>\n" +
+		"       </xsl:otherwise>\n" +
+		"       </xsl:choose>\n" +
 		"            <Currency>\n" +
 		"              <xsl:value-of select=\"$currency\"/>\n" +
 		"            </Currency>\n" +
+		"       <xsl:choose>\n" +
+		"     <xsl:when test=\"number(Discount) > 0\">\n" +
+		"        <Discount>\n" +
+		"            <xsl:value-of select=\"(./Discount)div(./PassengerCount)\"/>\n" +
+		"        </Discount>\n" +
+		"    </xsl:when>\n" +
+		"    <xsl:otherwise>\n" +
+		"        <Discount>0</Discount>\n" +
+		"    </xsl:otherwise>\n" +
+		"       </xsl:choose>\n" +
+		"     <xsl:choose>\n" +
+		"    <xsl:when test=\"number(Incentive) > 0\">\n" +
+		"        <Incentive>\n" +
+		"            <xsl:value-of select=\"(./Incentive)div(./PassengerCount)\"/>\n" +
+		"        </Incentive>\n" +
+		"    </xsl:when>\n" +
+		"    <xsl:otherwise>\n" +
+		"        <Incentive>0</Incentive>\n" +
+		"    </xsl:otherwise>\n" +
+		"     </xsl:choose>\n" +
 		"            <Markup>0</Markup>\n" +
 		"            <NetFare>0</NetFare>\n" +
 		"            <OtherCharges>0</OtherCharges>\n" +
@@ -1892,51 +1950,51 @@ const XSLTconstant = {
 		"            <TransactionFee>0</TransactionFee>\n" +
 		"            <YQTax>0</YQTax>\n" +
 		"          </Price>\n" +
-		"          <Seat />\n"
-		+ "			<SegmentDetails>\r\n"
-		+ "				<xsl:for-each select=\"SegmentDetails/SegmentDetails\">\r\n"
-		+ "					<SegmentDetails>\r\n"
-		+ "						<xsl:if test=\"CabinBaggage/Value != ''\">\r\n"
-		+ "							<CabinBaggage>\r\n"
-		+ "								<FreeText>\r\n"
-		+ "									<xsl:value-of select=\"CabinBaggage/FreeText\"/>\r\n"
-		+ "								</FreeText>\r\n"
-		+ "								<NoOfPiece>\r\n"
-		+ "									<xsl:value-of select=\"CabinBaggage/NoOfPiece\"/>\r\n"
-		+ "								</NoOfPiece>\r\n"
-		+ "								<Unit>\r\n"
-		+ "									<xsl:value-of select=\"CabinBaggage/Unit\"/>\r\n"
-		+ "								</Unit>\r\n"
-		+ "								<Value>\r\n"
-		+ "									<xsl:value-of select=\"CabinBaggage/Value\"/>\r\n"
-		+ "								</Value>\r\n"
-		+ "							</CabinBaggage>\r\n"
-		+ "						</xsl:if>\r\n"
-		+ "						<xsl:if test=\"CheckedInBaggage/Value != ''\">\r\n"
-		+ "							<CheckedInBaggage>\r\n"
-		+ "								<FreeText>\r\n"
-		+ "									<xsl:value-of select=\"CheckedInBaggage/FreeText\"/>\r\n"
-		+ "								</FreeText>\r\n"
-		+ "								<NoOfPiece>\r\n"
-		+ "									<xsl:value-of select=\"CheckedInBaggage/NoOfPiece\"/>\r\n"
-		+ "								</NoOfPiece>\r\n"
-		+ "								<Unit>\r\n"
-		+ "									<xsl:value-of select=\"CheckedInBaggage/Unit\"/>\r\n"
-		+ "								</Unit>\r\n"
-		+ "								<Value>\r\n"
-		+ "									<xsl:value-of select=\"CheckedInBaggage/Value\"/>\r\n"
-		+ "								</Value>\r\n"
-		+ "							</CheckedInBaggage>\r\n"
-		+ "						</xsl:if>\r\n"
-		+ "						<FareBasis>\r\n"
-		+ "							<xsl:value-of select=\"FareBasis\"/>\r\n"
-		+ "						</FareBasis>\r\n"
-		+ "						<SegRef>\r\n"
-		+ "							<xsl:value-of select=\"SegRef\"/>\r\n"
-		+ "						</SegRef>\r\n"
-		+ "					</SegmentDetails>\r\n"
-		+ "				</xsl:for-each>\r\n"
-		+ "			</SegmentDetails>\r\n" +
+		"          <Seat />\n" +
+		"			<SegmentDetails>\r\n" +
+		"				<xsl:for-each select=\"SegmentDetails/SegmentDetails\">\r\n" +
+		"					<SegmentDetails>\r\n" +
+		"						<xsl:if test=\"CabinBaggage/Value != ''\">\r\n" +
+		"							<CabinBaggage>\r\n" +
+		"								<FreeText>\r\n" +
+		"									<xsl:value-of select=\"CabinBaggage/FreeText\"/>\r\n" +
+		"								</FreeText>\r\n" +
+		"								<NoOfPiece>\r\n" +
+		"									<xsl:value-of select=\"CabinBaggage/NoOfPiece\"/>\r\n" +
+		"								</NoOfPiece>\r\n" +
+		"								<Unit>\r\n" +
+		"									<xsl:value-of select=\"CabinBaggage/Unit\"/>\r\n" +
+		"								</Unit>\r\n" +
+		"								<Value>\r\n" +
+		"									<xsl:value-of select=\"CabinBaggage/Value\"/>\r\n" +
+		"								</Value>\r\n" +
+		"							</CabinBaggage>\r\n" +
+		"						</xsl:if>\r\n" +
+		"						<xsl:if test=\"CheckedInBaggage/Value != ''\">\r\n" +
+		"							<CheckedInBaggage>\r\n" +
+		"								<FreeText>\r\n" +
+		"									<xsl:value-of select=\"CheckedInBaggage/FreeText\"/>\r\n" +
+		"								</FreeText>\r\n" +
+		"								<NoOfPiece>\r\n" +
+		"									<xsl:value-of select=\"CheckedInBaggage/NoOfPiece\"/>\r\n" +
+		"								</NoOfPiece>\r\n" +
+		"								<Unit>\r\n" +
+		"									<xsl:value-of select=\"CheckedInBaggage/Unit\"/>\r\n" +
+		"								</Unit>\r\n" +
+		"								<Value>\r\n" +
+		"									<xsl:value-of select=\"CheckedInBaggage/Value\"/>\r\n" +
+		"								</Value>\r\n" +
+		"							</CheckedInBaggage>\r\n" +
+		"						</xsl:if>\r\n" +
+		"						<FareBasis>\r\n" +
+		"							<xsl:value-of select=\"FareBasis\"/>\r\n" +
+		"						</FareBasis>\r\n" +
+		"						<FlightInfoIndex>\r\n" +
+		"							<xsl:value-of select=\"FlightInfoIndex\"/>\r\n" +
+		"						</FlightInfoIndex>\r\n" +
+		"					</SegmentDetails>\r\n" +
+		"				</xsl:for-each>\r\n" +
+		"			</SegmentDetails>\r\n" +
 		"          <TicketNumber>\n" +
 		"            <xsl:value-of select=\"''\"/>\n" +
 		"          </TicketNumber>\n" +
@@ -1953,21 +2011,22 @@ const XSLTconstant = {
 		"        </xsl:call-template>\n" +
 		"      </xsl:when>\n" +
 		"    </xsl:choose>\n" +
-		"  </xsl:template>\n" +
-		"\n" +
-		"\n" +
-		"  <xsl:template match=\"/\">\n" +
-		"    <FlightItinerary>\n" +
-		"      <xsl:copy-of select=\"$FinalOutput\"/>\n" +
+		"    </xsl:template>\n" +
+		"    \n" +
+		"    \n" +
+		"      <xsl:template match=\"/\">\n" +
+		"        <FlightItinerary>\n" +
+		"    <xsl:copy-of select=\"$FinalOutput\"/>\n" +
 		"    </FlightItinerary>\n" +
-		"  </xsl:template>\n" +
-		"\n" +
-		"  <xsl:template match=\"@* | node()\">\n" +
+		"    </xsl:template>\n" +
+		"    \n" +
+		"    <xsl:template match=\"@* | node()\">\n" +
 		"    <xsl:copy>\n" +
 		"      <xsl:apply-templates select=\"@* | node()\"/>\n" +
 		"    </xsl:copy>\n" +
-		"  </xsl:template>\n" +
-		"</xsl:stylesheet>",
+		"    </xsl:template>\n" +
+		"    </xsl:stylesheet>",
+
 	FarequoteXslt: ""
 		+ "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\r\n"
 		+ "    xmlns:msxsl=\"urn:schemas-microsoft-com:xslt\" exclude-result-prefixes=\"msxsl\"\r\n"
@@ -1992,12 +2051,28 @@ const XSLTconstant = {
 		+ "          <FareBasisCode>\r\n"
 		+ "            <xsl:value-of select=\"FareBasisCode\"/>\r\n"
 		+ "          </FareBasisCode>\r\n"
+		+ "          <FareFamilyCode>\r\n"
+		+ "            <xsl:value-of select=\"FareFamilyCode\"/>\r\n"
+		+ "          </FareFamilyCode>\r\n"
 		+ "			<FareRestriction>\r\n"
 		+ "				<xsl:value-of select=\"FareRestriction\"/>\r\n"
 		+ "			</FareRestriction>\r\n"
 		+ "			<FareRuleIndex>\r\n"
 		+ "				<xsl:value-of select=\"FareRuleIndex\"/>\r\n"
 		+ "			</FareRuleIndex>\r\n"
+		+ "          <xsl:choose>\r\n"
+		+ "            <xsl:when test=\"FlightId &gt; 0\">\r\n"
+		+ "              <FlightId>\r\n"
+		+ "                <xsl:value-of select=\"FlightId\"/>\r\n"
+		+ "              </FlightId>\r\n"
+		+ "            </xsl:when>\r\n"
+		+ "            <xsl:otherwise>\r\n"
+		+ "              <FlightId>0</FlightId>\r\n"
+		+ "            </xsl:otherwise>\r\n"
+		+ "          </xsl:choose>\r\n"
+		+ "			<Id>\r\n"
+		+ "				<xsl:value-of select=\"Id\"/>\r\n"
+		+ "			</Id>\r\n"
 		+ "			<JourneyId>\r\n"
 		+ "				<xsl:value-of select=\"JourneyId\"/>\r\n"
 		+ "			</JourneyId>\r\n"
@@ -2064,7 +2139,7 @@ const XSLTconstant = {
 		+ "    <xsl:otherwise>\r\n"
 		+ "        <PLBAmount>0</PLBAmount>\r\n"
 		+ "    </xsl:otherwise>\r\n"
-		+ "</xsl:choose>\r\n"
+		+ "   </xsl:choose>\r\n"
 		+ "          <PassengerCount>\r\n"
 		+ "            <xsl:value-of select=\"PassengerCount\"/>\r\n"
 		+ "          </PassengerCount>\r\n"
@@ -2109,16 +2184,22 @@ const XSLTconstant = {
 		+ "						<FareBasis>\r\n"
 		+ "							<xsl:value-of select=\"FareBasis\"/>\r\n"
 		+ "						</FareBasis>\r\n"
-		+ "						<SegRef>\r\n"
-		+ "							<xsl:value-of select=\"SegRef\"/>\r\n"
-		+ "						</SegRef>\r\n"
+		+ "						<FlightInfoIndex>\r\n"
+		+ "							<xsl:value-of select=\"FlightInfoIndex\"/>\r\n"
+		+ "						</FlightInfoIndex>\r\n"
 		+ "					</SegmentDetails>\r\n"
 		+ "				</xsl:for-each>\r\n"
 		+ "			</SegmentDetails>\r\n"
-		+ "          <Tax>\r\n"
-		+ "            <!--<xsl:value-of select=\"Tax\"/>-->\r\n"
-		+ "            <xsl:value-of select=\"sum(TaxList/TaxBreakUp/Amount)\"/>\r\n"
-		+ "          </Tax>\r\n"
+		+ "         <Tax>\r\n"
+		+ "         <xsl:choose>\r\n"
+		+ "          <xsl:when test=\"count(TaxList/TaxBreakUp) &gt; 0\">\r\n"
+		+ "          <xsl:value-of select=\"sum(TaxList/TaxBreakUp/Amount)\"/>\r\n"
+		+ "         </xsl:when>\r\n"
+		+ "         <xsl:otherwise>\r\n"
+		+ "         <xsl:value-of select=\"Tax\"/>\r\n"
+		+ "         </xsl:otherwise>\r\n"
+		+ "         </xsl:choose>\r\n"
+		+ "         </Tax>\r\n"
 		+ "          <TaxList>\r\n"
 		+ "            <xsl:if test=\"count(TaxList/TaxBreakUp) &gt; 0\">\r\n"
 		+ "              <xsl:for-each select=\"TaxList/TaxBreakUp\">\r\n"
@@ -2183,6 +2264,9 @@ const XSLTconstant = {
 		+ "            <BookingClass>\r\n"
 		+ "              <xsl:value-of select=\"BookingClass\"/>\r\n"
 		+ "            </BookingClass>\r\n"
+		//+ "            <CabinBaggage>\r\n"
+		//+ "              <xsl:value-of select=\"CabinBaggage\"/>\r\n"
+		//+ "            </CabinBaggage>\r\n"
 		+ "            <xsl:choose>\r\n"
 		+ "              <xsl:when test=\"CabinBaggage &gt; 0 or CabinBaggage!=string('')\">\r\n"
 		+ "                <CabinBaggage>\r\n"
@@ -2247,6 +2331,16 @@ const XSLTconstant = {
 		+ "              </xsl:when>\r\n"
 		+ "            </xsl:choose>\r\n"
 		+ "            <ETicketEligible>true</ETicketEligible>\r\n"
+		+ "          <xsl:choose>\r\n"
+		+ "            <xsl:when test=\"FlightId &gt; 0\">\r\n"
+		+ "              <FlightId>\r\n"
+		+ "                <xsl:value-of select=\"FlightId\"/>\r\n"
+		+ "              </FlightId>\r\n"
+		+ "            </xsl:when>\r\n"
+		+ "            <xsl:otherwise>\r\n"
+		+ "              <FlightId>0</FlightId>\r\n"
+		+ "            </xsl:otherwise>\r\n"
+		+ "          </xsl:choose>\r\n"
 		+ "            <FlightInfoIndex><xsl:value-of select=\"FlightInfoIndex\"/></FlightInfoIndex>\r\n"
 		+ "            <FlightNumber>\r\n"
 		+ "              <xsl:value-of select=\"FlightNumber\"/>\r\n"
@@ -2318,6 +2412,13 @@ const XSLTconstant = {
 		+ "                <xsl:value-of select=\"Stops\"/>\r\n"
 		+ "              </Stops>\r\n"
 		+ "            </xsl:if>\r\n"
+		+ "            <xsl:choose>\r\n"
+		+ "              <xsl:when test=\"SupplierFareClass &gt; 0 or SupplierFareClass!=string('')\">\r\n"
+		+ "                <SupplierFareClass>\r\n"
+		+ "                  <xsl:value-of select=\"SupplierFareClass\"/>\r\n"
+		+ "                </SupplierFareClass>\r\n"
+		+ "              </xsl:when>\r\n"
+		+ "            </xsl:choose>\r\n"
 		+ "          </FlightInfo>\r\n"
 		+ "        </xsl:for-each>\r\n"
 		+ "      </ArrayOfFlightInfo>\r\n"
@@ -2408,13 +2509,29 @@ const XSLTconstant = {
 		+ "          <xsl:value-of select=\"sum(//SearchResult/FareBreakdown/Fare/YQTax)\"/>\r\n"
 		+ "        </YQTax>\r\n"
 		+ "      </Price>\r\n"
-		+ "      <PrivateResultID>1</PrivateResultID>\r\n"
-		+ "      <PromoCode></PromoCode>\r\n"
-		+ "      <PromoCodeWarningText></PromoCodeWarningText>\r\n"
+		+ "      <xsl:if test=\"//SearchResult/PricingKeyDetail\">\r\n"
+		+ "        <PricingKeyDetail>\r\n"
+		+ "          <Airline>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/Airline\"/>\r\n"
+		+ "          </Airline>\r\n"
+		+ "          <Key>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/Key\"/>\r\n"
+		+ "          </Key>\r\n"
+		+ "          <ResultCount>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/ResultCount\"/>\r\n"
+		+ "          </ResultCount>\r\n"
+		+ "          <Source>\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/PricingKeyDetail/Source\"/>\r\n"
+		+ "          </Source>\r\n"
+		+ "        </PricingKeyDetail>\r\n"
+		+ "      </xsl:if>\r\n"
 		+ "      <ResultBookingSource>\r\n"
 		+ "        <xsl:value-of select=\"//SearchResult/ResultBookingSource\"/>\r\n"
 		+ "      </ResultBookingSource>\r\n"
-		+ "<ResultId xmlns:arr=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">\r\n"
+		+ "      <PrivateResultID>1</PrivateResultID>\r\n"
+		+ "      <PromoCode></PromoCode>\r\n"
+		+ "      <PromoCodeWarningText></PromoCodeWarningText>\r\n"
+		+ "	<ResultId xmlns:arr=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">\r\n"
 		+ "    <arr:int>\r\n"
 		+ "        <xsl:value-of select=\"//SearchResult/ResultId/int\"/>\r\n"
 		+ "    </arr:int>\r\n"
