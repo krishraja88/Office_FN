@@ -10,6 +10,8 @@ document.querySelector('.btn.btn-danger').addEventListener('click', eraseAll);
 document.getElementById('btn-json-farequote').addEventListener('click', jsonFareQuoteTransform);
 document.getElementById('btn-json-search-to-fq').addEventListener('click', jsonSearchToFqReqJson);
 document.getElementById('btn-json-fq-to-book').addEventListener('click', jsonFqRespToBookReqJson);
+document.getElementById('btn-json-Upsell-to-book').addEventListener('click', jsonUpsellRespToBookReqJson);
+document.getElementById('btn-Upsell-to-book').addEventListener('click', UpsellToBookReqXml);
 
 const currentYear = new Date().getFullYear();
 const childAge = currentYear - 9;
@@ -136,6 +138,155 @@ async function bookTransform() {
 
 	output.value = transformSearch(input, "Book")
 	await copy();
+}
+
+function extractFirstTagBlock(xml, tag) {
+	const open = `<${tag}>`;
+	const close = `</${tag}>`;
+	const start = xml.indexOf(open);
+	if (start === -1) return '';
+	const end = xml.indexOf(close, start);
+	if (end === -1) return '';
+	return xml.substring(start, end + close.length);
+}
+
+function extractFirstTagInner(xml, tag) {
+	const block = extractFirstTagBlock(xml, tag);
+	if (!block) return '';
+	return block.substring(`<${tag}>`.length, block.length - `</${tag}>`.length);
+}
+
+function extractFirstTagValue(xml, tag) {
+	const m = xml.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)</${tag}>`));
+	return m ? m[1].trim() : '';
+}
+
+function sumXmlTag(xml, tag) {
+	let sum = 0;
+	const re = new RegExp(`<${tag}>([\\d.]+)</${tag}>`, 'g');
+	let m;
+	while ((m = re.exec(xml)) !== null) sum += Number(m[1]) || 0;
+	return sum;
+}
+
+function buildFareBasisByIndexFromFareRules(fareRulesXml) {
+	const map = {};
+	const ruleRe = /<FareRule>([\s\S]*?)<\/FareRule>/g;
+	let m;
+	while ((m = ruleRe.exec(fareRulesXml)) !== null) {
+		const rule = m[1];
+		const idx = extractFirstTagValue(rule, 'FareRuleIndex');
+		const fareBasis = extractFirstTagValue(rule, 'FareBasisCode');
+		if (idx) map[idx] = fareBasis;
+	}
+	return map;
+}
+
+function buildUpsellFareSegmentDetailsXml(flightIndices, fareBasisByIndex) {
+	let s = '';
+	for (const idx of flightIndices) {
+		const fareBasis = fareBasisByIndex[idx] || '';
+		s += '<SegmentDetails>'
+			+ `<FareBasis>${escapeXml(fareBasis)}</FareBasis>`
+			+ `<FlightInfoIndex>${escapeXml(idx)}</FlightInfoIndex>`
+			+ '</SegmentDetails>';
+	}
+	return s;
+}
+
+function scaleUpsellFareForPerPaxPricing(fareBreakdownXml) {
+	return fareBreakdownXml.replace(/<Fare>([\s\S]*?)<\/Fare>/g, (match, inner) => {
+		const count = Number(extractFirstTagValue(inner, 'PassengerCount')) || 1;
+		if (count <= 1) return match;
+		let updated = inner;
+		const base = extractFirstTagValue(inner, 'BaseFare');
+		const tax = extractFirstTagValue(inner, 'Tax');
+		if (base !== '') {
+			updated = updated.replace(/<BaseFare>[\s\S]*?<\/BaseFare>/, `<BaseFare>${formatFqNumber(Number(base) * count)}</BaseFare>`);
+		}
+		if (tax !== '') {
+			updated = updated.replace(/<Tax>[\s\S]*?<\/Tax>/, `<Tax>${formatFqNumber(Number(tax) * count)}</Tax>`);
+		}
+		return `<Fare>${updated}</Fare>`;
+	});
+}
+
+function buildSearchResultInnerFromUpsell(optionBlock) {
+	const fareRulesXml = extractFirstTagBlock(optionBlock, 'FareRules');
+	if (!fareRulesXml) throw new Error('No FareRules found in the Upsell option.');
+
+	const flightInfoInner = extractFirstTagInner(optionBlock, 'FlightInfoList');
+	if (!flightInfoInner) throw new Error('No FlightInfoList found in the Upsell option.');
+
+	let fareBreakdownXml = extractFirstTagBlock(optionBlock, 'FareBreakDown');
+	if (!fareBreakdownXml) throw new Error('No FareBreakDown found in the Upsell option.');
+
+	const fareBasisByIndex = buildFareBasisByIndexFromFareRules(fareRulesXml);
+
+	const flightIndices = [];
+	const idxRe = /<FlightInfoIndex>([\s\S]*?)<\/FlightInfoIndex>/g;
+	let im;
+	while ((im = idxRe.exec(flightInfoInner)) !== null) flightIndices.push(im[1].trim());
+
+	const segmentDetailsXml = buildUpsellFareSegmentDetailsXml(flightIndices, fareBasisByIndex);
+
+	fareBreakdownXml = fareBreakdownXml
+		.replace(/^<FareBreakDown>/, '<FareBreakdown>')
+		.replace(/<\/FareBreakDown>$/, '</FareBreakdown>')
+		.replace(/<SegmentDetails\s*\/>/g, `<SegmentDetails>${segmentDetailsXml}</SegmentDetails>`)
+		.replace(/<SegmentDetails>\s*<\/SegmentDetails>/g, `<SegmentDetails>${segmentDetailsXml}</SegmentDetails>`);
+
+	const totalFare = sumXmlTag(fareBreakdownXml, 'TotalFare');
+
+	// The shared Book XSLT divides BaseFare/Tax by PassengerCount for the per-pax Price.
+	// Pre-scale by PassengerCount so each passenger's Price.PublishedFare = BaseFare and Price.Tax = Tax.
+	fareBreakdownXml = scaleUpsellFareForPerPaxPricing(fareBreakdownXml);
+
+	const validatingAirline = extractFirstTagValue(flightInfoInner, 'Airline')
+		|| extractFirstTagValue(fareRulesXml, 'Airline') || '';
+	const currency = extractFirstTagValue(optionBlock, 'Currency') || 'INR';
+	const nonRefundable = extractFirstTagValue(optionBlock, 'NonRefundable') || 'false';
+
+	return ''
+		+ `<Airline>${escapeXml(validatingAirline)}</Airline>`
+		+ `<ValidatingAirline>${escapeXml(validatingAirline)}</ValidatingAirline>`
+		+ `<Currency>${escapeXml(currency)}</Currency>`
+		+ `<NonRefundable>${escapeXml(nonRefundable)}</NonRefundable>`
+		+ '<SupplierSourceID>6</SupplierSourceID>'
+		+ `<TotalFare>${formatFqNumber(totalFare)}</TotalFare>`
+		+ '<ResultBookingSource></ResultBookingSource>'
+		+ '<FareKey></FareKey>'
+		+ '<ResponseParams/>'
+		+ fareBreakdownXml
+		+ fareRulesXml
+		+ `<Flights><ArrayOfFlightInfo>${flightInfoInner}</ArrayOfFlightInfo></Flights>`;
+}
+
+async function UpsellToBookReqXml() {
+	let input = document.querySelector('.form-control.input').value;
+	const output = document.querySelector('.form-control.output');
+
+	try {
+		if (input.indexOf('<UpsellOptions>') === -1 && input.indexOf('&lt;UpsellOptions&gt;') !== -1) {
+			input = input.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll('&#xD;', '');
+		}
+
+		const sessionId = extractFirstTagValue(input, 'SessionId');
+		if (sessionId) {
+			try { await navigator.clipboard.writeText(sessionId); } catch (_) { }
+			await new Promise(r => setTimeout(r, 1000));
+		}
+
+		const optionBlock = extractFirstTagInner(input, 'UpsellOptions');
+		if (!optionBlock) throw new Error('No UpsellOptions found in the Upsell XML response.');
+
+		const searchResultInner = buildSearchResultInnerFromUpsell(optionBlock);
+
+		output.value = transformSearch(searchResultInner, 'Book');
+		await copy();
+	} catch (e) {
+		output.value = e instanceof Error ? e.message : String(e);
+	}
 }
 
 function escapeXml(text) {
@@ -972,11 +1123,11 @@ function buildPassengerFromFareRow(fareRow, options) {
 		Seat: { Code: 'WINDOW', Description: 'Window Seat' },
 		Price: {
 			PublishedFare: publishedFare,
-			NetFare: publishedFare - 300,
-			Markup: 100,
-			OtherCharges: 50,
+			//NetFare: publishedFare - 300,
+			//Markup: 100,
+			//OtherCharges: 50,
 			Tax: perPaxTax,
-			TransactionFee: 25,
+			//TransactionFee: 25,
 			Currency: fare.Currency || fare.currency || 'INR',
 			AccPriceType: 1,
 			RateOfExchange: 1.0,
@@ -990,8 +1141,8 @@ function buildPassengerFromFareRow(fareRow, options) {
 			CancelCharges: Number(cancelPenalty),
 			RefundAmount: 0,
 			CreditCardCharges: 0,
-			Commission: 50,
-			Incentive: 10,
+			//Commission: 50,
+			//Incentive: 10,
 			Discount: 0,
 			PLBAmount: 0,
 			FlightIDRefList: segments.map(s => s.FlightRef)
@@ -1182,6 +1333,169 @@ async function jsonFqRespToBookReqJson() {
 		output.value = e instanceof Error ? e.message : String(e);
 	}
 }
+
+function buildUpsellAirProductDetails(fareBreakdown, segments, fareRules) {
+	const firstRow = (fareBreakdown && fareBreakdown[0]) || {};
+	const segmentDetails = firstRow.SegmentDetails || firstRow.segmentDetails || [];
+	const rules = fareRules || [];
+
+	const fareRuleBySector = {};
+	rules.forEach((fr) => {
+		const key = `${(fr.Origin || fr.origin || '').toUpperCase()}-${(fr.Destination || fr.destination || '').toUpperCase()}`;
+		fareRuleBySector[key] = fr;
+	});
+
+	return segmentDetails.map((sd, segPos) => {
+		const idx = String(sd.FlightInfoIndex ?? sd.flightInfoIndex ?? '');
+		const matchSeg = (segments || []).find((s) => String(s.FlightInfoIndex) === idx) || {};
+		const sectorKey = `${(matchSeg.Origin || '').toUpperCase()}-${(matchSeg.Destination || '').toUpperCase()}`;
+		const fareBasis = sd.FareBasis || sd.fareBasis || '';
+		const fr = fareRuleBySector[sectorKey]
+			|| rules.find((r) => (r.FareBasisCode || r.fareBasisCode) === fareBasis)
+			|| rules[segPos]
+			|| {};
+		return {
+			FlightInfoIndex: idx,
+			FareBasisCode: fareBasis || fr.FareBasisCode || fr.fareBasisCode || '',
+			BookingClass: sd.BookingClass || sd.bookingClass || matchSeg.BookingClass || '',
+			FareFamilyCode: fr.FareFamilyCode || fr.fareFamilyCode || ''
+		};
+	});
+}
+
+async function jsonUpsellRespToBookReqJson() {
+	const inputEl = document.querySelector('.form-control.input');
+	const output = document.querySelector('.form-control.output');
+
+	try {
+		const parsed = JSON.parse(inputEl.value.trim());
+		const sessionId = parsed.SessionId || parsed.sessionId || parsed.session_id || '';
+
+		if (sessionId) {
+			try { await navigator.clipboard.writeText(sessionId); } catch (_) { }
+			await new Promise(r => setTimeout(r, 150));
+			await new Promise(r => setTimeout(r, 1000));
+		}
+
+		const results = parsed.Results || parsed.results || {};
+		const options = results.UpsellOptionsList || results.upsellOptionsList || [];
+		if (!options.length) throw new Error('No UpsellOptionsList found in the Upsell Response JSON.');
+
+		const option = options[0];
+
+		let fareBreakdown = option.FareBreakDown || option.fareBreakDown
+			|| option.FareBreakdown || option.fareBreakdown || [];
+		if (!fareBreakdown.length) throw new Error('No FareBreakDown found in the selected Upsell option.');
+		fareBreakdown = sortFareBreakdownByPaxType(fareBreakdown);
+
+		const flightInfoList = option.FlightInfoList || option.flightInfoList || [];
+		if (!flightInfoList.length) throw new Error('No FlightInfoList found in the selected Upsell option.');
+
+		const segments = flattenFlightSegmentsFromFq([flightInfoList]);
+		if (!segments.length) throw new Error('No flight segments found in Upsell FlightInfoList.');
+
+		const firstSeg = segments[0] || {};
+		const lastSeg = segments[segments.length - 1] || {};
+
+		const upsellFareRules = option.FareRules || option.fareRules || [];
+		const airlineCode = firstSeg.AirlineCode
+			|| (upsellFareRules[0] && (upsellFareRules[0].Airline || upsellFareRules[0].airline)) || '';
+		const airlines = collectAirlineCodes({ Flights: [flightInfoList] });
+
+		const apd = buildUpsellAirProductDetails(fareBreakdown, segments, upsellFareRules);
+
+		const isRefundable = !(option.NonRefundable ?? option.nonRefundable ?? true);
+		const fare = {
+			Currency: option.Currency || option.currency || 'INR',
+			ValidatingAirline: airlineCode,
+			Source: parsed.Source || parsed.source || '',
+			FareKey: option.fareKey || option.FareKey || '',
+			//FareKey: option.ResponseParams?.ResultIndex || option.responseParams?.resultIndex || '',
+			IsRefundable: isRefundable,
+			IssuanceType: 'ETicket',
+			IdentificationCode: '',
+			PromoCode: '',
+			AirProductDetails: apd
+		};
+
+		const fareRules = segments.map((seg) => {
+			const matchApd = apdForFlightInfoIndex(apd, seg.FlightInfoIndex) || {};
+			return {
+				Origin: seg.Origin,
+				Destination: seg.Destination,
+				Airline: seg.AirlineCode,
+				FareBasis: matchApd.FareBasisCode || '',
+				FareBasisCode: matchApd.FareBasisCode || '',
+				FareFamilyCode: matchApd.FareFamilyCode || '',
+				RuleDetail: '',
+				FareRestriction: isRefundable ? 'Refundable' : 'NonRefundable',
+				FareRuleIndex: seg.FlightInfoIndex,
+				JourneyId: `J${seg.TripIndicator || 1}`,
+				DepartureTime: seg.DepTime
+			};
+		});
+
+		const cancelPenalty = 0;
+		const depTime = firstSeg.DepTime || '';
+		const travelDate = depTime ? depTime.split('T')[0] + 'T00:00:00' : '';
+
+		const passengers = [];
+		let globalPassengerIndex = 0;
+		for (const fareRow of fareBreakdown) {
+			const count = Number(fareRow.PassengerCount ?? fareRow.passengerCount ?? 0);
+			if (count <= 0) continue;
+			for (let i = 0; i < count; i++) {
+				passengers.push(buildPassengerFromFareRow(fareRow, {
+					fare,
+					segments,
+					airProductDetails: apd,
+					airlineCode,
+					cancelPenalty,
+					isLeadPax: globalPassengerIndex === 0,
+					passengerIndex: globalPassengerIndex
+				}));
+				globalPassengerIndex += 1;
+			}
+		}
+
+		if (!passengers.length) {
+			throw new Error('No passengers found in FareBreakDown (missing or zero PassengerCount).');
+		}
+
+		const bookReq = {
+			ClientDetails: buildClientDetails(sessionId),
+			SourceContext: buildSourceContext(fare, airlines),
+			FlightItinerary: {
+				Segments: segments,
+				FareRules: fareRules,
+				FareKey: fare.FareKey || '',
+				FlightBookingSource: fare.Source || '',
+				SupplierSourceID: 6,
+				Origin: firstSeg.Origin || '',
+				Destination: lastSeg.Destination || '',
+				PNR: '',
+				Passenger: passengers,
+				IssuanceType: fare.IssuanceType || 'ETicket',
+				SessionId: sessionId,
+				UniqueId: 'UNIQ-BK-' + String(generateRandomTimestamp()).slice(0, 3),
+				TravelDate: travelDate,
+				ValidatingAirlineCode: airlineCode,
+				AliasAirlineCode: '',
+				AirlineCode: airlineCode,
+				ClientName: 'ABC Travels',
+				UserName: 'testuser',
+				DiscountFareType: 'NotSet',
+				BookType: 1
+			}
+		};
+
+		output.value = JSON.stringify(bookReq, null, 4);
+		await copy();
+	} catch (e) {
+		output.value = e instanceof Error ? e.message : String(e);
+	}
+}
+
 function generateRandomTimestamp() {
 	return Math.floor(10000000 + Math.random() * 90000000);
 }
