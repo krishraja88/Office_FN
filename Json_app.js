@@ -531,6 +531,94 @@ function sumFareField(fares, field) {
 	return fares.reduce((a, f) => a + Number(f[field] ?? 0), 0);
 }
 
+function buildPriceAccountsXml(priceItem) {
+	if (!priceItem || typeof priceItem !== 'object') return '';
+	let taxBreakInner = '';
+	const taxBreakup = priceItem.taxBreakup || priceItem.TaxBreakup || [];
+	if (Array.isArray(taxBreakup) && taxBreakup.length) {
+		for (const t of taxBreakup) {
+			taxBreakInner += '<TaxBreakUp>';
+			taxBreakInner += `<Amount>${formatFqNumber(t.amount ?? t.Amount)}</Amount>`;
+			taxBreakInner += `<TaxType>${escapeXml(t.taxType ?? t.TaxType ?? '')}</TaxType>`;
+			taxBreakInner += '</TaxBreakUp>';
+		}
+	}
+	let flightIdInner = '';
+	const flightIds = priceItem.flightIDRefList || priceItem.FlightIDRefList || [];
+	if (Array.isArray(flightIds) && flightIds.length) {
+		for (const id of flightIds) {
+			flightIdInner += `<arr:string>${escapeXml(id)}</arr:string>`;
+		}
+	}
+	const paxType = priceItem.type ?? priceItem.Type ?? '';
+	let s = '<Price>';
+	s += `<AccPriceType>${escapeXml(priceItem.accPriceType ?? priceItem.AccPriceType ?? 'PublishedFare')}</AccPriceType>`;
+	s += `<AdditionalTxnFee>${formatFqNumber(priceItem.additionalTxnFee ?? priceItem.AdditionalTxnFee ?? 0)}</AdditionalTxnFee>`;
+	s += `<AirlineBaggageCharges>${formatFqNumber(priceItem.airlineBaggageCharges ?? priceItem.AirlineBaggageCharges ?? 0)}</AirlineBaggageCharges>`;
+	s += `<AirlineMealCharges>${formatFqNumber(priceItem.airlineMealCharges ?? priceItem.AirlineMealCharges ?? 0)}</AirlineMealCharges>`;
+	s += `<AirlineSSRCharges>${formatFqNumber(priceItem.airlineSSRCharges ?? priceItem.AirlineSSRCharges ?? 0)}</AirlineSSRCharges>`;
+	s += `<AirlineSeatCharges>${formatFqNumber(priceItem.airlineSeatCharges ?? priceItem.AirlineSeatCharges ?? 0)}</AirlineSeatCharges>`;
+	s += `<CancelCharges>${formatFqNumber(priceItem.cancelCharges ?? priceItem.CancelCharges ?? 0)}</CancelCharges>`;
+	s += `<Commission>${formatFqNumber(priceItem.commission ?? priceItem.Commission ?? 0)}</Commission>`;
+	s += `<CreditCardCharges>${formatFqNumber(priceItem.creditCardCharges ?? priceItem.CreditCardCharges ?? 0)}</CreditCardCharges>`;
+	s += `<Currency>${escapeXml(priceItem.currency ?? priceItem.Currency ?? '')}</Currency>`;
+	s += `<Discount>${formatFqNumber(priceItem.discount ?? priceItem.Discount ?? 0)}</Discount>`;
+	if (flightIdInner) {
+		s += '<FlightIDRefList xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays">';
+		s += flightIdInner;
+		s += '</FlightIDRefList>';
+	} else {
+		s += '<FlightIDRefList/>';
+	}
+	s += `<Incentive>${formatFqNumber(priceItem.incentive ?? priceItem.Incentive ?? 0)}</Incentive>`;
+	s += `<Markup>${formatFqNumber(priceItem.markup ?? priceItem.Markup ?? 0)}</Markup>`;
+	s += `<NetFare>${formatFqNumber(priceItem.netFare ?? priceItem.NetFare ?? 0)}</NetFare>`;
+	s += `<OtherCharges>${formatFqNumber(priceItem.otherCharges ?? priceItem.OtherCharges ?? 0)}</OtherCharges>`;
+	s += `<PLBAmount>${formatFqNumber(priceItem.plbAmount ?? priceItem.PLBAmount ?? 0)}</PLBAmount>`;
+	s += `<PassengerCount>${formatFqNumber(priceItem.passengerCount ?? priceItem.PassengerCount ?? 0)}</PassengerCount>`;
+	s += `<PublishedFare>${formatFqNumber(priceItem.publishedFare ?? priceItem.PublishedFare ?? 0)}</PublishedFare>`;
+	s += `<RateOfExchange>${formatFqNumber(priceItem.rateOfExchange ?? priceItem.RateOfExchange ?? 0)}</RateOfExchange>`;
+	s += `<RefundAmount>${formatFqNumber(priceItem.refundAmount ?? priceItem.RefundAmount ?? 0)}</RefundAmount>`;
+	s += `<Tax>${formatFqNumber(priceItem.tax ?? priceItem.Tax ?? 0)}</Tax>`;
+	s += '<TaxBreakup>';
+	s += taxBreakInner;
+	s += '</TaxBreakup>';
+	s += `<TransactionFee>${formatFqNumber(priceItem.transactionFee ?? priceItem.TransactionFee ?? 0)}</TransactionFee>`;
+	s += paxType.length ? `<Type>${escapeXml(paxType)}</Type>` : '<Type/>';
+	s += `<YQTax>${formatFqNumber(priceItem.yqTax ?? priceItem.YQTax ?? 0)}</YQTax>`;
+	s += '</Price>';
+	return s;
+}
+
+function resolvePricesFromSearch(pricing, result) {
+	const candidates = [
+		pricing?.prices,
+		pricing?.Prices,
+		result?.prices,
+		result?.Prices
+	];
+	for (const c of candidates) {
+		if (Array.isArray(c) && c.length > 0) return c;
+	}
+	return null;
+}
+
+function buildPricesXml(prices, pricesRequired) {
+	if (!pricesRequired || !Array.isArray(prices) || prices.length === 0) {
+		return '<Prices i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"/>';
+	}
+	let inner = '';
+	for (const priceItem of prices) {
+		inner += buildPriceAccountsXml(priceItem);
+	}
+	return `<Prices>${inner}</Prices>`;
+}
+
+function isPricesNodeRequired() {
+	const chk = document.getElementById('chk-prices-required');
+	return !!(chk && chk.checked);
+}
+
 function extractSessionIdFromSearchJson(parsed) {
 	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
 	const keyOrder = ['sessionId', 'SessionId', 'session_id', 'sessionID'];
@@ -572,7 +660,8 @@ function normalizeSearchJsonToResult(parsed) {
 	throw new Error('JSON must include a non-empty Results array (full search response), or fareBreakupDetails on the root / searchResult / result / data object (single search result).');
 }
 
-function searchJsonToFareQuoteXml(parsed) {
+function searchJsonToFareQuoteXml(parsed, options) {
+	const pricesRequired = !!(options && options.pricesRequired);
 	const result = normalizeSearchJsonToResult(parsed);
 	if (!result.fareBreakupDetails || !Array.isArray(result.fareBreakupDetails) || result.fareBreakupDetails.length === 0) {
 		throw new Error('Search result must have a non-empty fareBreakupDetails array.');
@@ -598,6 +687,10 @@ function searchJsonToFareQuoteXml(parsed) {
 	const eticket = pricing.eticketEligible !== false ? 'true' : 'false';
 	const nonRef = pricing.nonRefundable === true ? 'true' : 'false';
 	const screenScrap = pricing.isScreenScrapped === true ? 'true' : 'false';
+	const isMultiTSTFare = (pricing.isMultiTSTFare ?? pricing.IsMultiTSTFare
+		?? result.isMultiTSTFare ?? result.IsMultiTSTFare) === true;
+	// Prices details only when checkbox is checked and supplier response has prices; else nil.
+	const prices = pricesRequired ? resolvePricesFromSearch(pricing, result) : null;
 	const issuance = pricing.issuanceType != null && String(pricing.issuanceType).length
 		? escapeXml(pricing.issuanceType)
 		: 'HoldAndTicket';
@@ -621,6 +714,7 @@ function searchJsonToFareQuoteXml(parsed) {
 	xml += `<FareType>${escapeXml(pricing.fareType || 'PUB')}</FareType>`;
 	xml += buildFlightsXml(flights2d, airPd);
 	xml += `<IndexForScreenScrap>${formatFqNumber(pricing.indexForScreenScrap ?? 0)}</IndexForScreenScrap>`;
+	xml += `<IsMultiTSTFare>${isMultiTSTFare ? 'true' : 'false'}</IsMultiTSTFare>`;
 	xml += `<IsScreenScrapped>${screenScrap}</IsScreenScrapped>`;
 	xml += `<IssuanceType>${issuance}</IssuanceType>`;
 	xml += `<NonRefundable>${nonRef}</NonRefundable>`;
@@ -641,6 +735,7 @@ function searchJsonToFareQuoteXml(parsed) {
 	xml += '<TransactionFee>0</TransactionFee>';
 	xml += `<YQTax>${formatFqNumber(yqSum)}</YQTax>`;
 	xml += '</Price>';
+	xml += buildPricesXml(prices, pricesRequired);
 	xml += `<PrivateResultID>${formatFqNumber(pricing.privateResultID ?? 0)}</PrivateResultID>`;
 	xml += `<PromoCode>${escapeXml(pricing.promoCode ?? '')}</PromoCode>`;
 	xml += `<PromoCodeWarningText>${escapeXml(pricing.promoCodeWarningText ?? '')}</PromoCodeWarningText>`;
@@ -676,7 +771,9 @@ async function jsonFareQuoteTransform() {
 			await new Promise((resolve) => setTimeout(resolve, 150));
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 		}
-		output.value = searchJsonToFareQuoteXml(parsed);
+		output.value = searchJsonToFareQuoteXml(parsed, {
+			pricesRequired: isPricesNodeRequired()
+		});
 		await copy();
 	} catch (e) {
 		output.value = e instanceof Error ? e.message : String(e);
@@ -1584,6 +1681,11 @@ const XSLTconstant = {
 		"      <xsl:value-of select=\"//SearchResult/ResultBookingSource\"/>\n" +
 		"    </FlightBookingSource>\n" +
 		"    <IsDomestic>true</IsDomestic>\n" +
+		"    <xsl:if test=\"string-length(//SearchResult/IsMultiTSTFare) > 0\">\n" +
+		"      <IsMultiTSTFare>\n" +
+		"        <xsl:value-of select=\"//SearchResult/IsMultiTSTFare\"/>\n" +
+		"      </IsMultiTSTFare>\n" +
+		"    </xsl:if>\n" +
 		"    <xsl:if test=\"string-length(//SearchResult/IsScreenScrapped) > 0\">\n" +
 		"      <IsScreenScrapped>\n" +
 		"        <xsl:value-of select=\"//SearchResult/IsScreenScrapped\"/>\n" +
