@@ -109,13 +109,76 @@ async function copySessionId() {
 	await navigator.clipboard.writeText(output.value.substring(firstIndex, lastIndex));
 }
 
+function pricesNilXml() {
+	return '<Prices i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"/>';
+}
+
+function replaceOrInsertPricesNode(fqXml, pricesXml) {
+	if (/<Prices\b[^>]*\/>/.test(fqXml)) {
+		return fqXml.replace(/<Prices\b[^>]*\/>/, pricesXml);
+	}
+	if (/<Prices[\s>]/.test(fqXml)) {
+		return fqXml.replace(/<Prices[\s\S]*?<\/Prices>/, pricesXml);
+	}
+	return fqXml.replace(/<\/Price>/, `</Price>${pricesXml}`);
+}
+
+function buildFqPricesXmlFromSourceXml(sourceXml, pricesRequired) {
+	if (!pricesRequired) return pricesNilXml();
+
+	const pricesBlock = extractFirstTagBlock(sourceXml, 'Prices');
+	if (!pricesBlock) return pricesNilXml();
+
+	// Prefer source PriceAccounts as-is (matches SearchResult.Prices: PriceAccounts[])
+	if (/<PriceAccounts>/.test(pricesBlock)) {
+		let accounts = '';
+		const re = /<PriceAccounts>[\s\S]*?<\/PriceAccounts>/g;
+		let m;
+		while ((m = re.exec(pricesBlock)) !== null) accounts += m[0];
+		if (accounts) return `<Prices>${accounts}</Prices>`;
+	}
+
+	// Legacy: Prices/Price → Prices/PriceAccounts
+	if (/<Price>/.test(pricesBlock)) {
+		let accounts = '';
+		const re = /<Price>([\s\S]*?)<\/Price>/g;
+		let m;
+		while ((m = re.exec(pricesBlock)) !== null) {
+			accounts += `<PriceAccounts>${m[1]}</PriceAccounts>`;
+		}
+		if (accounts) return `<Prices>${accounts}</Prices>`;
+	}
+
+	return pricesNilXml();
+}
+
+function injectFqPricesAndMultiTst(fqXml, sourceXml) {
+	const hasSourcePrices = /<PriceAccounts>/.test(sourceXml)
+		|| /<Prices>\s*<Price[\s>]/.test(sourceXml);
+	const pricesRequired = isPricesNodeRequired() || hasSourcePrices;
+	const multiRaw = extractFirstTagValue(sourceXml, 'IsMultiTSTFare');
+	const multiXml = `<IsMultiTSTFare>${multiRaw === 'true' || multiRaw === 'True' ? 'true' : (multiRaw || 'false')}</IsMultiTSTFare>`;
+	const pricesXml = buildFqPricesXmlFromSourceXml(sourceXml, pricesRequired);
+
+	let out = fqXml;
+	if (/<IsMultiTSTFare\b[^>]*\/>/.test(out)) {
+		out = out.replace(/<IsMultiTSTFare\b[^>]*\/>/, multiXml);
+	} else if (/<IsMultiTSTFare[\s>]/.test(out)) {
+		out = out.replace(/<IsMultiTSTFare[\s\S]*?<\/IsMultiTSTFare>/, multiXml);
+	} else if (/<\/IndexForScreenScrap>/.test(out)) {
+		out = out.replace(/<\/IndexForScreenScrap>/, `</IndexForScreenScrap>${multiXml}`);
+	}
+
+	return replaceOrInsertPricesNode(out, pricesXml);
+}
+
 async function fQTransform() {
 	await sr();
 
 	let input = document.querySelector('.form-control.output').value;
 	let output = document.querySelector('.form-control.output');
 
-	input = transformSearch(input, "Farequote")
+	input = injectFqPricesAndMultiTst(transformSearch(input, "Farequote"), input);
 
 	await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 500ms
 
@@ -127,7 +190,7 @@ async function fQTransformOnly() {
 	let input = document.querySelector('.form-control.input').value;
 	let output = document.querySelector('.form-control.output');
 
-	output.value = transformSearch(input, "Farequote")
+	output.value = injectFqPricesAndMultiTst(transformSearch(input, "Farequote"), input);
 
 	await copy();
 }
@@ -551,7 +614,8 @@ function buildPriceAccountsXml(priceItem) {
 		}
 	}
 	const paxType = priceItem.type ?? priceItem.Type ?? '';
-	let s = '<Price>';
+	// SearchResult.Prices is PriceAccounts[] — serialize as <PriceAccounts>, not <Price>
+	let s = '<PriceAccounts>';
 	s += `<AccPriceType>${escapeXml(priceItem.accPriceType ?? priceItem.AccPriceType ?? 'PublishedFare')}</AccPriceType>`;
 	s += `<AdditionalTxnFee>${formatFqNumber(priceItem.additionalTxnFee ?? priceItem.AdditionalTxnFee ?? 0)}</AdditionalTxnFee>`;
 	s += `<AirlineBaggageCharges>${formatFqNumber(priceItem.airlineBaggageCharges ?? priceItem.AirlineBaggageCharges ?? 0)}</AirlineBaggageCharges>`;
@@ -586,7 +650,7 @@ function buildPriceAccountsXml(priceItem) {
 	s += `<TransactionFee>${formatFqNumber(priceItem.transactionFee ?? priceItem.TransactionFee ?? 0)}</TransactionFee>`;
 	s += paxType.length ? `<Type>${escapeXml(paxType)}</Type>` : '<Type/>';
 	s += `<YQTax>${formatFqNumber(priceItem.yqTax ?? priceItem.YQTax ?? 0)}</YQTax>`;
-	s += '</Price>';
+	s += '</PriceAccounts>';
 	return s;
 }
 
@@ -2875,6 +2939,14 @@ const XSLTconstant = {
 		+ "      <FareType>PUB</FareType>\r\n"
 		+ "      <xsl:copy-of select=\"$FinalOutput\"/>\r\n"
 		+ "      <IndexForScreenScrap>0</IndexForScreenScrap>\r\n"
+		+ "      <IsMultiTSTFare>\r\n"
+		+ "        <xsl:choose>\r\n"
+		+ "          <xsl:when test=\"string-length(//SearchResult/IsMultiTSTFare) &gt; 0\">\r\n"
+		+ "            <xsl:value-of select=\"//SearchResult/IsMultiTSTFare\"/>\r\n"
+		+ "          </xsl:when>\r\n"
+		+ "          <xsl:otherwise>false</xsl:otherwise>\r\n"
+		+ "        </xsl:choose>\r\n"
+		+ "      </IsMultiTSTFare>\r\n"
 		+ "      <xsl:if test=\"string-length(//SearchResult/IsScreenScrapped) &gt; 0\">\r\n"
 		+ "        <IsScreenScrapped>\r\n"
 		+ "          <xsl:value-of select=\"//SearchResult/IsScreenScrapped\"/>\r\n"
@@ -2927,6 +2999,25 @@ const XSLTconstant = {
 		+ "          <xsl:value-of select=\"sum(//SearchResult/FareBreakdown/Fare/YQTax)\"/>\r\n"
 		+ "        </YQTax>\r\n"
 		+ "      </Price>\r\n"
+		+ "      <xsl:choose>\r\n"
+		+ "        <xsl:when test=\"count(//SearchResult/Prices/PriceAccounts) &gt; 0\">\r\n"
+		+ "          <Prices>\r\n"
+		+ "            <xsl:copy-of select=\"//SearchResult/Prices/PriceAccounts\"/>\r\n"
+		+ "          </Prices>\r\n"
+		+ "        </xsl:when>\r\n"
+		+ "        <xsl:when test=\"count(//SearchResult/Prices/Price) &gt; 0\">\r\n"
+		+ "          <Prices>\r\n"
+		+ "            <xsl:for-each select=\"//SearchResult/Prices/Price\">\r\n"
+		+ "              <PriceAccounts>\r\n"
+		+ "                <xsl:copy-of select=\"./*\"/>\r\n"
+		+ "              </PriceAccounts>\r\n"
+		+ "            </xsl:for-each>\r\n"
+		+ "          </Prices>\r\n"
+		+ "        </xsl:when>\r\n"
+		+ "        <xsl:otherwise>\r\n"
+		+ "          <Prices i:nil=\"true\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"/>\r\n"
+		+ "        </xsl:otherwise>\r\n"
+		+ "      </xsl:choose>\r\n"
 		+ "      <xsl:if test=\"//SearchResult/PricingKeyDetail\">\r\n"
 		+ "        <PricingKeyDetail>\r\n"
 		+ "          <Airline>\r\n"
