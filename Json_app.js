@@ -195,20 +195,11 @@ async function fQTransformOnly() {
 	await copy();
 }
 
-function stripEmptyLastTicketDateNodes(xml) {
-	if (!xml) return xml;
-	return xml
-		.replace(/<LastTicketDate\b[^>]*i:nil\s*=\s*["']true["'][^>]*\/>/gi, '')
-		.replace(/<LastTicketDate\b[^>]*i:nil\s*=\s*["']true["'][^>]*>\s*<\/LastTicketDate>/gi, '')
-		.replace(/<LastTicketDate\s*\/>/gi, '')
-		.replace(/<LastTicketDate>\s*<\/LastTicketDate>/gi, '');
-}
-
 async function bookTransform() {
 	let input = document.querySelector('.form-control.input').value;
 	let output = document.querySelector('.form-control.output');
 
-	output.value = stripEmptyLastTicketDateNodes(transformSearch(input, "Book"));
+	output.value = transformSearch(input, "Book")
 	await copy();
 }
 
@@ -872,10 +863,7 @@ function transformSearch(searchResultSet, stepName) {
 
 	// Parse the XSLT and XML content
 	const xsltDoc = new DOMParser().parseFromString(xsltCode, 'application/xml');
-	// Drop nil/blank LastTicketDate before transform so FlightInfo copy-of does not emit <LastTicketDate/>
-	let preparedXml = stripEmptyLastTicketDateNodes(searchResultSet);
-	preparedXml = preparedXml.replace(/i:nil="true"/g, '');
-	const xmlDoc = new DOMParser().parseFromString(`<SearchResult>${preparedXml}</SearchResult>`, 'application/xml');
+	const xmlDoc = new DOMParser().parseFromString(`<SearchResult>${searchResultSet.replace(/i:nil="true"/g, '')}</SearchResult>`, 'application/xml');
 
 	// Create a new XSLT processor
 	const xsltProcessor = new XSLTProcessor();
@@ -885,11 +873,7 @@ function transformSearch(searchResultSet, stepName) {
 	const transformedDoc = xsltProcessor.transformToDocument(xmlDoc);
 
 	// Serialize the transformed document back to a string
-	let result = new XMLSerializer().serializeToString(transformedDoc);
-	if (stepName === "Book") {
-		result = stripEmptyLastTicketDateNodes(result);
-	}
-	return result;
+	return new XMLSerializer().serializeToString(transformedDoc);
 }
 
 
@@ -1781,11 +1765,9 @@ const XSLTconstant = {
 		"        </xsl:otherwise>\n" +
 		"      </xsl:choose>\n" +
 		"    </IssuanceType>\n" +
-		"    <xsl:if test=\"string-length(normalize-space(//SearchResult/LastTicketDate)) &gt; 0\">\n" +
-		"      <LastTicketDate>\n" +
-		"        <xsl:value-of select=\"//SearchResult/LastTicketDate\"/>\n" +
-		"      </LastTicketDate>\n" +
-		"    </xsl:if>\n" +
+		"    <LastTicketDate>\n" +
+		"      <xsl:value-of select=\"//SearchResult/Flights/ArrayOfFlightInfo//FlightInfo/DepartureTime\"/>\n" +
+		"    </LastTicketDate>\n" +
 		"    <NonRefundable>\n" +
 		"      <xsl:choose>\n" +
 		"        <xsl:when test=\"string-length(//SearchResult/NonRefundable) > 0\">\n" +
