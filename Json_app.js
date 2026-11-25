@@ -1678,8 +1678,13 @@ const XSLTconstant = {
 		"    </xsl:variable>\n" +
 		"    \n" +
 		"    <xsl:variable name=\"segments\">\n" +
-		"    <xsl:copy-of select=\"//SearchResult/Flights/ArrayOfFlightInfo/FlightInfo\"/>\n" +
+		"    <xsl:for-each select=\"//SearchResult/Flights/ArrayOfFlightInfo/FlightInfo\">\n" +
+		"      <FlightInfo>\n" +
+		"        <xsl:copy-of select=\"@* | node()[not(self::LastTicketDate)]\"/>\n" +
+		"      </FlightInfo>\n" +
+		"    </xsl:for-each>\n" +
 		"    </xsl:variable>\n" +
+
 		"    \n" +
 		"   <xsl:variable name=\"FinalOutput\">\n" +
 		"    <AgencyDetails>\n" +
